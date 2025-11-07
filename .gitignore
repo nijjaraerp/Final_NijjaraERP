@@ -6,9 +6,12 @@
 .clasp.token.json
 
 # Downloaded credentials from GCP (as you mentioned)
-client_secret_*.json
+client_secret_212474200735-1rdc7n36mvr60djop3g56j0qus6mv8sc.apps.googleusercontent.com.json
 credentials.json
 
 # Node.js cache and dependency folder
 node_modules
 npm-debug.log
+
+# Local context files for AI agents
+.context/
