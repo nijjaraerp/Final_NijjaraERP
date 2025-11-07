@@ -26,13 +26,13 @@ The system's primary function is to centralize and manage all core business oper
 
 The entire system is built on the Google Workspace platform, leveraging its integrated, serverless environment.
 
-- **BACKEND**: Google Apps Script (.js)  
+- **BACKEND**: Google Apps Script (.js)
   Handles all server-side logic, data processing, authentication, permission handling, and database communication.
 
-- **FRONTEND**: HTML / CSS / JavaScript (.html)  
+- **FRONTEND**: HTML / CSS / JavaScript (.html)
   A single `App.html` file serves as the SPA container. All UI components (HTML), styling (CSS), and client-side interactivity (JavaScript) are loaded into this single page.
 
-- **DATABASE**: Google Sheets  
+- **DATABASE**: Google Sheets
   Each Google Sheet (e.g., `SYS_Users`) acts as a database table. This model provides a transparent and auditable data store.
 
 
@@ -46,14 +46,14 @@ This is the most critical concept of the database design. The system is built on
 
 Within this single sheet, two distinct types of columns co-exist to ensure both data integrity and a user-friendly (Arabic) interface:
 
-**A. ENGINE-FACING (ENGLISH HEADERS)**  
-- Headers: Strict, programmatic English (e.g., `client_id`, `contact_name`).  
-- Purpose: Data Integrity & Storage.  
+**A. ENGINE-FACING (ENGLISH HEADERS)**
+- Headers: Strict, programmatic English (e.g., `client_id`, `contact_name`).
+- Purpose: Data Integrity & Storage.
 - Usage: The backend **ONLY** writes to and reads from these columns for data manipulation, logic, and validation.
 
-**B. USER-FACING (ARABIC HEADERS)**  
-- Headers: User-friendly Arabic (e.g., `معرف العميل`, `اسم جهة الاتصال`).  
-- Purpose: Presentation & Display.  
+**B. USER-FACING (ARABIC HEADERS)**
+- Headers: User-friendly Arabic (e.g., `معرف العميل`, `اسم جهة الاتصال`).
+- Purpose: Presentation & Display.
 - Usage: The frontend **ONLY** reads from these columns to display data in tables, forms, and pop-ups.
 
 ### 3.2 BOOTSTRAP & DYNAMIC RENDERING
