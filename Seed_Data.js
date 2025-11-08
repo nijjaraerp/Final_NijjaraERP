@@ -12,7 +12,46 @@ const SEED_ADMIN_ROLE_NAME = 'Admin';
 const SEED_EMPLOYEE_FULL_NAME = 'Mohamed Sherif Amin Elkhoraiby';
 const SEED_ADMIN_USER_ID = 'mkhoraiby';
 const SEED_ADMIN_EMAIL = 'm.elkhoraiby@gmail.com';
-const SEED_ADMIN_PASSWORD = '210388'; // Will be hashed; consider replacing after initial seed.
+const SEED_ADMIN_PASSWORD = '210388'; // Will be hashed; change after first login.
+
+// ---------------------------------------------------------------------------
+// --- ID GENERATION UTILITIES ---
+// ---------------------------------------------------------------------------
+
+/**
+ * Generates a sequential ID in the format PREFIX-0001, PREFIX-0002, etc.
+ * Scans existing IDs in the specified column and returns the next available number.
+ * 
+ * @param {GoogleAppsScript.Spreadsheet.Sheet} sheet - The sheet to scan
+ * @param {string[]} headers - The header row
+ * @param {string} idColumnName - The name of the ID column (e.g., 'role_id')
+ * @param {string} prefix - The prefix for the ID (e.g., 'ROLE')
+ * @returns {string} The next sequential ID (e.g., 'ROLE-0001')
+ */
+function generateSequentialId_(sheet, headers, idColumnName, prefix) {
+	const idIdx = headers.indexOf(idColumnName);
+	if (idIdx === -1) throw new Error(`Column ${idColumnName} not found in headers`);
+	
+	const data = getDataBody_(sheet, headers);
+	let maxNumber = 0;
+	
+	// Scan all existing IDs to find the highest number
+	for (let r = 0; r < data.length; r++) {
+		const existingId = String(data[r][idIdx] || '').trim();
+		if (existingId.startsWith(prefix + '-')) {
+			const numPart = existingId.substring(prefix.length + 1);
+			const num = parseInt(numPart, 10);
+			if (!isNaN(num) && num > maxNumber) {
+				maxNumber = num;
+			}
+		}
+	}
+	
+	// Generate next ID with zero-padding
+	const nextNumber = maxNumber + 1;
+	const paddedNumber = String(nextNumber).padStart(4, '0');
+	return prefix + '-' + paddedNumber;
+}
 
 // ---------------------------------------------------------------------------
 // --- MASTER ORCHESTRATOR ---
@@ -58,7 +97,7 @@ function seedRoles_(ss, rollbackStack) {
 	const roleIdIdx = headers.indexOf('role_id');
 	if (roleNameIdx === -1 || roleIdIdx === -1) throw new Error('Required headers missing in SYS_Roles');
 
-		const data = getDataBody_(sheet, headers);
+	const data = getDataBody_(sheet, headers);
 	for (let r = 0; r < data.length; r++) {
 		if ((data[r][roleNameIdx] + '').trim().toLowerCase() === SEED_ADMIN_ROLE_NAME.toLowerCase()) {
 			const existingId = data[r][roleIdIdx];
@@ -67,8 +106,8 @@ function seedRoles_(ss, rollbackStack) {
 		}
 	}
 
-	// Generate role ID
-	const roleId = 'ROLE-' + new Date().getTime();
+	// Generate sequential role ID (ROLE-0001, ROLE-0002, etc.)
+	const roleId = generateSequentialId_(sheet, headers, 'role_id', 'ROLE');
 	const newRow = buildRow_(headers, {
 		role_id: roleId,
 		role_name_english: SEED_ADMIN_ROLE_NAME,
@@ -100,7 +139,7 @@ function seedEmployee_(ss, rollbackStack) {
 	const employeeIdIdx = headers.indexOf('employee_id');
 	if (fullNameEnglishIdx === -1 || employeeIdIdx === -1) throw new Error('Required headers missing in HRM_Employees');
 
-		const data = getDataBody_(sheet, headers);
+	const data = getDataBody_(sheet, headers);
 	for (let r = 0; r < data.length; r++) {
 		if ((data[r][fullNameEnglishIdx] + '').trim().toLowerCase() === SEED_EMPLOYEE_FULL_NAME.toLowerCase()) {
 			const existingId = data[r][employeeIdIdx];
@@ -109,7 +148,8 @@ function seedEmployee_(ss, rollbackStack) {
 		}
 	}
 
-	const employeeId = 'EMP-' + new Date().getTime();
+	// Generate sequential employee ID (EMP-0001, EMP-0002, etc.)
+	const employeeId = generateSequentialId_(sheet, headers, 'employee_id', 'EMP');
 	const newRow = buildRow_(headers, {
 		employee_id: employeeId,
 		full_name_english: SEED_EMPLOYEE_FULL_NAME,
@@ -148,12 +188,14 @@ function seedAdminUser_(ss, roleId, employeeId, rollbackStack) {
 	const employeeIdIdx = headers.indexOf('employee_id');
 	const fullNameIdx = headers.indexOf('full_name');
 	const passwordHashIdx = headers.indexOf('password_hash');
-	if ([userIdIdx, emailIdx, roleIdIdx, employeeIdIdx, fullNameIdx, passwordHashIdx].some(i => i === -1)) {
-		throw new Error('Required headers missing in SYS_Users');
+	const passwordSaltIdx = headers.indexOf('password_salt');
+	
+	if ([userIdIdx, emailIdx, roleIdIdx, employeeIdIdx, fullNameIdx, passwordHashIdx, passwordSaltIdx].some(i => i === -1)) {
+		throw new Error('Required headers missing in SYS_Users. Please check that password_salt column exists.');
 	}
 
 	// Check existing user uniqueness
-		const data = getDataBody_(sheet, headers);
+	const data = getDataBody_(sheet, headers);
 	for (let r = 0; r < data.length; r++) {
 		const existingUserId = (data[r][userIdIdx] + '').trim().toLowerCase();
 		const existingEmail = (data[r][emailIdx] + '').trim().toLowerCase();
@@ -175,6 +217,7 @@ function seedAdminUser_(ss, roleId, employeeId, rollbackStack) {
 		user_id: SEED_ADMIN_USER_ID,
 		email: SEED_ADMIN_EMAIL,
 		password_hash: hash,
+		password_salt: salt,
 		full_name: SEED_EMPLOYEE_FULL_NAME,
 		role_id: roleId,
 		employee_id: employeeId,
@@ -182,14 +225,13 @@ function seedAdminUser_(ss, roleId, employeeId, rollbackStack) {
 		phone: '',
 		created_at: new Date(),
 		is_deleted: false,
-		record_notes: 'Initial admin seed',
-		// Store salt in an extension column if schema later adds it; for now log it.
+		record_notes: 'Initial admin seed - Password: 210388 (CHANGE IMMEDIATELY AFTER FIRST LOGIN)'
 	});
 	sheet.appendRow(newRow);
 	const appendedRowNumber = sheet.getLastRow();
 	rollbackStack.push({ sheetName: 'SYS_Users', rowNumber: appendedRowNumber });
 	logInfo_('seedAdminUser_', 'Inserted admin user ' + SEED_ADMIN_USER_ID + ' with role ' + roleId);
-	logInfo_('seedAdminUser_', 'Admin user salt (store separately if schema extended): ' + salt);
+	logInfo_('seedAdminUser_', '⚠️ DEFAULT PASSWORD: 210388 - MUST BE CHANGED AFTER FIRST LOGIN');
 }
 
 // ---------------------------------------------------------------------------

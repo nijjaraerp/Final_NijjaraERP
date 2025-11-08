@@ -545,7 +545,7 @@ const ERP_SCHEMA = {
     // Audit Headers
     "record_id", "created_at", "created_by", "modified_at", "modified_by", "is_deleted", "record_notes",
     // Engine Headers (English)
-    "user_id", "email", "password_hash", "full_name", "role_id", "employee_id", "is_active", "phone",
+    "user_id", "email", "password_hash", "password_salt", "full_name", "role_id", "employee_id", "is_active", "phone",
     // View Headers (Arabic)
     "اسم المستخدم", "البريد الإلكتروني", "الاسم بالكامل", "الدور", "رقم الموظف", "الحالة", "الهاتف"
   ],
