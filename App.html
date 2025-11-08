@@ -6,6 +6,12 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Nijjara ERP - نظام إدارة نجارة</title>
   
+  <!-- IMMEDIATE DEBUG -->
+  <script>
+    console.log('=== App.html HEAD is loading ===');
+    console.log('Document:', document);
+  </script>
+  
   <!-- Preload Critical Resources -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,8 +24,17 @@
   
   <!-- Include CSS -->
   <?!= include('CSS'); ?>
+  
+  <script>
+    console.log('=== CSS should be loaded ===');
+  </script>
 </head>
 <body>
+  
+  <script>
+    console.log('=== BODY tag reached ===');
+    console.log('Body background:', getComputedStyle(document.body).backgroundColor);
+  </script>
   
   <!-- ============================================ -->
   <!-- LOADING SCREEN -->
@@ -40,7 +55,7 @@
   <!-- ============================================ -->
   <!-- LOGIN VIEW -->
   <!-- ============================================ -->
-  <div id="login-view" class="view" style="display: none;">
+  <div id="login-view" class="hidden">
     <div class="login-container">
       <div class="login-card">
         <!-- Logo/Brand -->

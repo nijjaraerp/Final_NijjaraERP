@@ -44,7 +44,7 @@ function authenticateUser(username, password) {
     const rows = data.slice(1);
     
     // Find column indices
-    const usernameCol = headers.indexOf('username');
+    const usernameCol = headers.indexOf('user_id');  // Changed from 'username' to 'user_id'
     const passwordHashCol = headers.indexOf('password_hash');
     const passwordSaltCol = headers.indexOf('password_salt');
     const isActiveCol = headers.indexOf('is_active');
@@ -53,7 +53,7 @@ function authenticateUser(username, password) {
     
     // Validate required columns exist
     if (usernameCol === -1 || passwordHashCol === -1 || passwordSaltCol === -1) {
-      logError_(functionName, 'Required columns not found in SYS_Users');
+      logError_(functionName, `Required columns not found in SYS_Users. Found columns: ${headers.join(', ')}`);
       return {
         success: false,
         message: 'خطأ في تكوين النظام'

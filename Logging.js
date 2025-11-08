@@ -100,15 +100,16 @@ function _log(level, functionName, message) {
     const user = Session.getActiveUser().getEmail() || 'UNKNOWN_USER';
 
     // The row data must match the order of headers in the SYS_Error_Log sheet
-    // as defined in Setup.js: [log_id, timestamp, user, log_level, function_name, message]
-    // 'log_id' is typically handled by a formula or trigger, so we leave it blank.
+    // Schema: timestamp, log_type, function_name, error_message, user_id, client_ip, user_agent, stack_trace
     const logEntry = [
-      '', // log_id (A) - often a formula like =ROW()-1
-      timestamp, // timestamp (B)
-      user, // user (C)
-      level, // log_level (D)
-      functionName, // function_name (E)
-      message // message (F)
+      timestamp,        // timestamp
+      level,            // log_type (INFO, ERROR, WARN, DEBUG)
+      functionName,     // function_name
+      message,          // error_message
+      user,             // user_id
+      '',               // client_ip (not available server-side)
+      '',               // user_agent (not available server-side)
+      ''                // stack_trace (filled by error handler if available)
     ];
 
     // Append the new log entry to the sheet

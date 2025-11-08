@@ -265,7 +265,10 @@ const LoginModule = {
     
     if (loginView && workspaceView) {
       loginView.classList.add('hidden');
+      loginView.style.display = 'none';
+      
       workspaceView.classList.remove('hidden');
+      workspaceView.style.display = 'flex';
       
       // Initialize workspace (to be implemented in future)
       if (typeof WorkspaceModule !== 'undefined' && WorkspaceModule.init) {
@@ -305,6 +308,13 @@ function checkSession() {
     }
   } else {
     Logger.info('Login', 'No active session, showing login view');
+    
+    // Show login view
+    const loginView = document.getElementById('login-view');
+    if (loginView) {
+      loginView.style.display = 'block';
+      loginView.classList.remove('hidden');
+    }
     
     // Initialize login module
     LoginModule.init();
