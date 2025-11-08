@@ -16,10 +16,13 @@ window.onerror = function(message, source, lineno, colno, error) {
     error: error
   });
   
-  showToast(
-    'حدث خطأ غير متوقع. يرجى تحديث الصفحة أو الاتصال بالدعم الفني.',
-    'error'
-  );
+  // Only show toast if the function exists
+  if (typeof showToast === 'function') {
+    showToast(
+      'حدث خطأ غير متوقع. يرجى تحديث الصفحة أو الاتصال بالدعم الفني.',
+      'error'
+    );
+  }
   
   return false; // Allow default error handling
 };

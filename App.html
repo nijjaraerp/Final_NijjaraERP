@@ -220,17 +220,48 @@
 
   <!-- App Initialization -->
   <script>
+    // Simple debug log
+    console.log('=== Nijjara ERP: App.html loaded ===');
+    console.log('Document ready state:', document.readyState);
+    
     // App initialization when DOM is ready
     document.addEventListener('DOMContentLoaded', function() {
-      Logger.info('App', 'DOM Content Loaded - Initializing application');
+      console.log('=== DOM Content Loaded ===');
+      
+      // Check if functions exist
+      console.log('Logger exists:', typeof Logger !== 'undefined');
+      console.log('hideLoading exists:', typeof hideLoading !== 'undefined');
+      console.log('checkSession exists:', typeof checkSession !== 'undefined');
+      
+      if (typeof Logger !== 'undefined') {
+        Logger.info('App', 'DOM Content Loaded - Initializing application');
+      }
       
       // Hide loading screen
-      hideLoading();
+      if (typeof hideLoading !== 'undefined') {
+        hideLoading();
+      } else {
+        console.error('hideLoading function not found!');
+        // Manual fallback
+        const loadingEl = document.getElementById('loading-screen');
+        if (loadingEl) {
+          loadingEl.classList.add('hidden');
+        }
+      }
       
       // Check if user has active session
-      checkSession();
+      if (typeof checkSession !== 'undefined') {
+        checkSession();
+      } else {
+        console.error('checkSession function not found!');
+        // Show login view as fallback
+        const loginView = document.getElementById('login-view');
+        if (loginView) {
+          loginView.style.display = 'block';
+        }
+      }
       
-      Logger.info('App', 'Application initialized successfully');
+      console.log('=== Application initialized ===');
     });
   </script>
 
