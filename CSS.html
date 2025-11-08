@@ -196,6 +196,17 @@ a:hover {
   }
 }
 
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
 .toast-icon {
   flex-shrink: 0;
 }
@@ -218,67 +229,83 @@ a:hover {
    LOGIN VIEW
    ---------------------------------------- */
 #login-view {
-  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
   padding: var(--spacing-lg);
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+#login-view.hidden {
+  display: none !important;
+  z-index: -1;
 }
 
 .login-container {
   width: 100%;
-  max-width: 450px;
+  max-width: 360px;
 }
 
 .login-card {
   background-color: var(--color-bg-secondary);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-xl);
-  padding: var(--spacing-2xl);
+  padding: var(--spacing-lg);
   border: 1px solid var(--color-border);
 }
 
 .login-header {
   text-align: center;
-  margin-bottom: var(--spacing-2xl);
+  margin-bottom: var(--spacing-md);
+}
+
+.login-header h1 {
+  font-size: 1.5rem;
+  margin: 0.25rem 0;
 }
 
 .login-icon {
-  font-size: 4rem !important;
+  font-size: 2.5rem !important;
   color: var(--color-primary);
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-xs);
 }
 
 .login-subtitle {
   color: var(--color-text-secondary);
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   margin: 0;
 }
 
 .login-form {
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-sm);
 }
 
 /* ----------------------------------------
    FORM ELEMENTS
    ---------------------------------------- */
 .form-group {
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-sm);
 }
 
 .form-group label {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-sm);
+  gap: var(--spacing-xs);
+  margin-bottom: 0.25rem;
   color: var(--color-text-primary);
   font-weight: 500;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
 .form-group label .material-icons {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   color: var(--color-text-secondary);
 }
 
@@ -288,13 +315,13 @@ a:hover {
 .form-group select,
 .form-group textarea {
   width: 100%;
-  padding: var(--spacing-md);
+  padding: 0.6rem 0.75rem;
   background-color: var(--color-bg-tertiary);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   color: var(--color-text-primary);
   font-family: 'Cairo', sans-serif;
-  font-size: 1rem;
+  font-size: 0.95rem;
   transition: all var(--transition-base);
 }
 
@@ -341,14 +368,15 @@ a:hover {
 .checkbox-label {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-xs);
   cursor: pointer;
   user-select: none;
+  font-size: 0.9rem;
 }
 
 .checkbox-label input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   cursor: pointer;
   accent-color: var(--color-primary);
 }
@@ -356,9 +384,9 @@ a:hover {
 .error-message {
   display: block;
   color: var(--color-error);
-  font-size: 0.875rem;
-  margin-top: var(--spacing-xs);
-  min-height: 1.25rem;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  min-height: 1rem;
 }
 
 .form-error {
@@ -379,11 +407,11 @@ a:hover {
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-xl);
+  padding: 0.6rem var(--spacing-lg);
   border: none;
   border-radius: var(--radius-md);
   font-family: 'Cairo', sans-serif;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
   transition: all var(--transition-base);
@@ -408,8 +436,8 @@ a:hover {
 
 .btn-login {
   width: 100%;
-  padding: var(--spacing-lg);
-  font-size: 1.1rem;
+  padding: 0.7rem;
+  font-size: 1rem;
   position: relative;
 }
 
@@ -450,6 +478,10 @@ a:hover {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+#workspace-view.hidden {
+  display: none !important;
 }
 
 /* Top Navigation */

@@ -3,13 +3,21 @@
    Server-side authentication, session management, security checks
    ============================================ */
 
+const AUTH_SECURITY_CONFIG = {
+  MAX_FAILED_ATTEMPTS: 5,
+  LOCKOUT_MINUTES: 15,
+  SESSION_DURATION_MINUTES: 24 * 60
+};
+
+const LOGIN_SECURITY_PREFIX = 'LOGIN_SECURITY_';
+
 /**
  * Authenticate user with username and password
  * @param {string} username - The username
  * @param {string} password - The password
  * @returns {Object} Authentication response with session token and user data
  */
-function authenticateUser(username, password) {
+function authenticateUser(username, password, clientContext) {
   const functionName = 'authenticateUser';
   logInfo_(functionName, `Authentication attempt for user: ${username}`);
   
@@ -25,6 +33,16 @@ function authenticateUser(username, password) {
     
     // Sanitize username
     username = username.toString().trim().toLowerCase();
+
+    // Security state check (rate limiting / lockout)
+    const securityState = getLoginSecurityState_(username);
+    if (isSecurityStateLocked_(securityState)) {
+      logWarn_(functionName, `Locked account login attempt: ${username}`);
+      return {
+        success: false,
+        message: buildLockoutMessage_(securityState.lockedUntil)
+      };
+    }
     
     // Get SYS_Users sheet
     const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -44,7 +62,7 @@ function authenticateUser(username, password) {
     const rows = data.slice(1);
     
     // Find column indices
-    const usernameCol = headers.indexOf('username');
+    const usernameCol = headers.indexOf('user_id');  // Changed from 'username' to 'user_id'
     const passwordHashCol = headers.indexOf('password_hash');
     const passwordSaltCol = headers.indexOf('password_salt');
     const isActiveCol = headers.indexOf('is_active');
@@ -53,7 +71,7 @@ function authenticateUser(username, password) {
     
     // Validate required columns exist
     if (usernameCol === -1 || passwordHashCol === -1 || passwordSaltCol === -1) {
-      logError_(functionName, 'Required columns not found in SYS_Users');
+      logError_(functionName, `Required columns not found in SYS_Users. Found columns: ${headers.join(', ')}`);
       return {
         success: false,
         message: 'خطأ في تكوين النظام'
@@ -75,6 +93,14 @@ function authenticateUser(username, password) {
     // Check if user exists
     if (!userRow) {
       logWarn_(functionName, `User not found: ${username}`);
+      const attemptResult = registerFailedAttempt_(username);
+      if (attemptResult.locked) {
+        logWarn_(functionName, `Account locked due to repeated failures: ${username}`);
+        return {
+          success: false,
+          message: buildLockoutMessage_(attemptResult.lockedUntil)
+        };
+      }
       return {
         success: false,
         message: 'اسم المستخدم أو كلمة المرور غير صحيحة'
@@ -107,6 +133,20 @@ function authenticateUser(username, password) {
     
     if (!isPasswordValid) {
       logWarn_(functionName, `Invalid password for user: ${username}`);
+      const attemptResult = registerFailedAttempt_(username);
+      if (attemptResult.locked) {
+        logWarn_(functionName, `Account locked due to repeated failures: ${username}`);
+        return {
+          success: false,
+          message: buildLockoutMessage_(attemptResult.lockedUntil)
+        };
+      }
+      if (attemptResult.remainingAttempts !== null && attemptResult.remainingAttempts !== undefined) {
+        return {
+          success: false,
+          message: `اسم المستخدم أو كلمة المرور غير صحيحة. تبقى لديك ${attemptResult.remainingAttempts} محاولة قبل إيقاف الحساب.`
+        };
+      }
       return {
         success: false,
         message: 'اسم المستخدم أو كلمة المرور غير صحيحة'
@@ -115,9 +155,12 @@ function authenticateUser(username, password) {
     
     // Password is valid - proceed with authentication
     logInfo_(functionName, `Authentication successful for user: ${username}`);
+    clearLoginSecurityState_(username);
     
     // Generate session token
     const sessionToken = generateSessionToken_();
+    const normalizedClient = normalizeClientContext_(clientContext);
+    const sessionRecord = recordSession_(sessionToken, username, normalizedClient);
     
     // Get user details
     const employeeId = userRow[employeeIdCol];
@@ -154,7 +197,8 @@ function authenticateUser(username, password) {
       user: user,
       permissions: bootstrapData.permissions,
       tabs: bootstrapData.tabs,
-      settings: bootstrapData.settings
+      settings: bootstrapData.settings,
+      expiresAt: sessionRecord.expiresAt
     };
     
   } catch (error) {
@@ -466,7 +510,7 @@ function updateLastLogin_(username) {
     const data = usersSheet.getDataRange().getValues();
     const headers = data[0];
     
-    const usernameCol = headers.indexOf('username');
+    const usernameCol = headers.indexOf('user_id');
     const lastLoginCol = headers.indexOf('last_login');
     
     if (usernameCol === -1 || lastLoginCol === -1) {
@@ -493,14 +537,21 @@ function updateLastLogin_(username) {
  * Logout user (optional - can be used to invalidate session on server)
  * @returns {boolean} Success status
  */
-function logoutUser() {
+function logoutUser(sessionToken) {
   const functionName = 'logoutUser';
   logInfo_(functionName, 'User logout');
   
-  // In a more advanced implementation, you could:
-  // 1. Store active sessions in a sheet
-  // 2. Invalidate the session token on logout
-  // 3. Track logout events for auditing
+  try {
+    if (sessionToken) {
+      const deactivated = deactivateSessionByToken_(sessionToken);
+      if (!deactivated) {
+        logWarn_(functionName, `Session token not found during logout: ${sessionToken}`);
+      }
+    }
+  } catch (error) {
+    logError_(functionName, 'Failed to deactivate session during logout', error);
+    return false;
+  }
   
   return true;
 }
@@ -520,38 +571,50 @@ function verifySessionToken(token) {
         message: 'No token provided'
       };
     }
-    
-    // In a more advanced implementation, you would:
-    // 1. Store active sessions in a sheet
-    // 2. Verify the token exists and is not expired
-    // 3. Return user data associated with the token
-    
-    // For now, we'll implement basic token validation
-    // Token format: timestamp-random
-    const parts = token.split('-');
-    
-    if (parts.length !== 2) {
+    const sessionRecord = getSessionRowByToken_(token);
+    if (!sessionRecord) {
       return {
         valid: false,
-        message: 'Invalid token format'
+        message: 'Session not found'
+      };
+    }
+
+    const { row, sheet, activeCol, expiryCol, userCol } = sessionRecord;
+
+    if (activeCol === -1 || expiryCol === -1) {
+      logError_(functionName, 'SYS_Sessions sheet missing required columns');
+      return {
+        valid: false,
+        message: 'Session validation unavailable'
+      };
+    }
+
+    const isActive = Boolean(row[activeCol]);
+    if (!isActive) {
+      return {
+        valid: false,
+        message: 'Session inactive'
+      };
+    }
+
+    const expiryValue = row[expiryCol];
+    const now = new Date();
+    if (expiryValue instanceof Date && expiryValue < now) {
+      sheet.getRange(sessionRecord.rowIndex, activeCol + 1).setValue(false);
+      return {
+        valid: false,
+        message: 'Session expired',
+        expiresAt: expiryValue.toISOString()
       };
     }
     
-    const timestamp = parseInt(parts[0]);
-    const now = new Date().getTime();
-    const age = now - timestamp;
-    const maxAge = 24 * 60 * 60 * 1000; // 24 hours
-    
-    if (age > maxAge) {
-      return {
-        valid: false,
-        message: 'Token expired'
-      };
-    }
-    
+    const hasUserCol = typeof userCol === 'number' && userCol >= 0;
+
     return {
       valid: true,
-      message: 'Token valid'
+      message: 'Session valid',
+      userId: hasUserCol ? row[userCol] || '' : '',
+      expiresAt: expiryValue instanceof Date ? expiryValue.toISOString() : null
     };
     
   } catch (error) {
@@ -560,5 +623,291 @@ function verifySessionToken(token) {
       valid: false,
       message: 'Token verification error'
     };
+  }
+}
+
+// ----------------------------------------------
+// SECURITY HELPERS
+// ----------------------------------------------
+
+function getScriptSecurityProperties_() {
+  return PropertiesService.getScriptProperties();
+}
+
+function getLoginSecurityKey_(username) {
+  return `${LOGIN_SECURITY_PREFIX}${username}`;
+}
+
+function getLoginSecurityState_(username) {
+  if (!username) {
+    return { attempts: 0, lockedUntil: 0 };
+  }
+
+  const props = getScriptSecurityProperties_();
+  const key = getLoginSecurityKey_(username);
+  const now = Date.now();
+
+  try {
+    const raw = props.getProperty(key);
+    if (!raw) {
+      return { attempts: 0, lockedUntil: 0 };
+    }
+    const parsed = JSON.parse(raw);
+    const lockedUntil = Number(parsed.lockedUntil) || 0;
+    const attempts = Number(parsed.attempts) || 0;
+
+    if (lockedUntil && now > lockedUntil) {
+      props.deleteProperty(key);
+      return { attempts: 0, lockedUntil: 0 };
+    }
+
+    return {
+      attempts: Math.max(0, attempts),
+      lockedUntil: lockedUntil
+    };
+  } catch (error) {
+    logError_('getLoginSecurityState_', 'Failed to read login security state', error);
+    props.deleteProperty(key);
+    return { attempts: 0, lockedUntil: 0 };
+  }
+}
+
+function saveLoginSecurityState_(username, state) {
+  if (!username) {
+    return;
+  }
+  const props = getScriptSecurityProperties_();
+  const key = getLoginSecurityKey_(username);
+
+  if (!state || (!state.lockedUntil && (!state.attempts || state.attempts <= 0))) {
+    props.deleteProperty(key);
+    return;
+  }
+
+  try {
+    props.setProperty(key, JSON.stringify({
+      attempts: Math.max(0, Number(state.attempts) || 0),
+      lockedUntil: Number(state.lockedUntil) || 0
+    }));
+  } catch (error) {
+    logError_('saveLoginSecurityState_', 'Failed to persist login security state', error);
+  }
+}
+
+function clearLoginSecurityState_(username) {
+  if (!username) {
+    return;
+  }
+  try {
+    getScriptSecurityProperties_().deleteProperty(getLoginSecurityKey_(username));
+  } catch (error) {
+    logError_('clearLoginSecurityState_', 'Failed to clear login security state', error);
+  }
+}
+
+function isSecurityStateLocked_(state) {
+  if (!state || !state.lockedUntil) {
+    return false;
+  }
+  return Date.now() < Number(state.lockedUntil);
+}
+
+function registerFailedAttempt_(username) {
+  if (!username) {
+    return { locked: false, remainingAttempts: null, lockedUntil: 0 };
+  }
+
+  const now = Date.now();
+  const state = getLoginSecurityState_(username);
+
+  if (isSecurityStateLocked_(state)) {
+    return { locked: true, remainingAttempts: 0, lockedUntil: state.lockedUntil };
+  }
+
+  const currentAttempts = (state.attempts || 0) + 1;
+  const maxAttempts = AUTH_SECURITY_CONFIG.MAX_FAILED_ATTEMPTS;
+  const response = {
+    locked: false,
+    remainingAttempts: Math.max(maxAttempts - currentAttempts, 0),
+    lockedUntil: 0
+  };
+
+  if (currentAttempts >= maxAttempts) {
+    response.locked = true;
+    response.remainingAttempts = 0;
+    response.lockedUntil = now + AUTH_SECURITY_CONFIG.LOCKOUT_MINUTES * 60 * 1000;
+    saveLoginSecurityState_(username, { attempts: 0, lockedUntil: response.lockedUntil });
+  } else {
+    saveLoginSecurityState_(username, { attempts: currentAttempts, lockedUntil: 0 });
+  }
+
+  return response;
+}
+
+function buildLockoutMessage_(lockedUntil) {
+  if (!lockedUntil) {
+    return 'تم إيقاف الحساب مؤقتاً بسبب محاولات فاشلة متعددة. يرجى المحاولة لاحقاً.';
+  }
+  const remainingMs = lockedUntil - Date.now();
+  const remainingMinutes = Math.max(1, Math.ceil(remainingMs / 60000));
+  return `تم إيقاف الحساب مؤقتاً بسبب محاولات فاشلة متعددة. يرجى المحاولة بعد ${remainingMinutes} دقيقة.`;
+}
+
+function normalizeClientContext_(clientContext) {
+  if (!clientContext || typeof clientContext !== 'object') {
+    return {
+      userAgent: '',
+      timezone: '',
+      language: '',
+      platform: '',
+      screen: '',
+      ipAddress: ''
+    };
+  }
+
+  const sanitize = value => (typeof value === 'string' ? value : '');
+
+  return {
+    userAgent: sanitize(clientContext.userAgent).slice(0, 512),
+    timezone: sanitize(clientContext.timezone).slice(0, 64),
+    language: sanitize(clientContext.language).slice(0, 32),
+    platform: sanitize(clientContext.platform).slice(0, 64),
+    screen: sanitize(clientContext.screen).slice(0, 32),
+    ipAddress: sanitize(clientContext.ipAddress).slice(0, 64)
+  };
+}
+
+// ----------------------------------------------
+// SESSION RECORD HELPERS
+// ----------------------------------------------
+
+function recordSession_(sessionId, username, clientContext) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheetByName('SYS_Sessions');
+    if (!sheet) {
+      logWarn_('recordSession_', 'SYS_Sessions sheet not found');
+      return { expiresAt: null };
+    }
+
+    cleanupExpiredSessions_(sheet);
+
+    const loginTime = new Date();
+    const expiryTime = new Date(loginTime.getTime() + AUTH_SECURITY_CONFIG.SESSION_DURATION_MINUTES * 60 * 1000);
+
+    sheet.appendRow([
+      sessionId,
+      username,
+      loginTime,
+      expiryTime,
+      clientContext.ipAddress || '',
+      clientContext.userAgent || '',
+      true
+    ]);
+
+    return {
+      expiresAt: expiryTime.toISOString()
+    };
+  } catch (error) {
+    logError_('recordSession_', 'Failed to record session', error);
+    return { expiresAt: null };
+  }
+}
+
+function cleanupExpiredSessions_(sheet) {
+  try {
+    const data = sheet.getDataRange().getValues();
+    if (data.length <= 1) {
+      return;
+    }
+
+    const headers = data[0];
+    const expiryCol = headers.indexOf('expiry_time');
+    const activeCol = headers.indexOf('is_active');
+
+    if (expiryCol === -1 || activeCol === -1) {
+      return;
+    }
+
+    const now = new Date();
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      const expiryValue = row[expiryCol];
+      const isActive = Boolean(row[activeCol]);
+      if (isActive && expiryValue instanceof Date && expiryValue < now) {
+        sheet.getRange(i + 1, activeCol + 1).setValue(false);
+      }
+    }
+  } catch (error) {
+    logError_('cleanupExpiredSessions_', 'Failed to cleanup expired sessions', error);
+  }
+}
+
+function getSessionRowByToken_(token) {
+  if (!token) {
+    return null;
+  }
+
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheetByName('SYS_Sessions');
+    if (!sheet) {
+      return null;
+    }
+
+    const data = sheet.getDataRange().getValues();
+    if (data.length <= 1) {
+      return null;
+    }
+
+    const headers = data[0];
+    const sessionIdCol = headers.indexOf('session_id');
+    const userCol = headers.indexOf('user_id');
+    const expiryCol = headers.indexOf('expiry_time');
+    const activeCol = headers.indexOf('is_active');
+
+    if (sessionIdCol === -1) {
+      return null;
+    }
+
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][sessionIdCol] === token) {
+        return {
+          sheet: sheet,
+          rowIndex: i + 1,
+          row: data[i],
+          headers: headers,
+          sessionIdCol: sessionIdCol,
+          userCol: userCol,
+          expiryCol: expiryCol,
+          activeCol: activeCol
+        };
+      }
+    }
+
+    return null;
+  } catch (error) {
+    logError_('getSessionRowByToken_', 'Failed to retrieve session row', error);
+    return null;
+  }
+}
+
+function deactivateSessionByToken_(token) {
+  const sessionRecord = getSessionRowByToken_(token);
+  if (!sessionRecord) {
+    return false;
+  }
+
+  const { sheet, rowIndex, activeCol } = sessionRecord;
+  if (activeCol === -1) {
+    return false;
+  }
+
+  try {
+    sheet.getRange(rowIndex, activeCol + 1).setValue(false);
+    return true;
+  } catch (error) {
+    logError_('deactivateSessionByToken_', 'Failed to deactivate session', error);
+    return false;
   }
 }

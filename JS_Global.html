@@ -7,25 +7,92 @@
 // ----------------------------------------
 // GLOBAL ERROR HANDLER
 // ----------------------------------------
+function handleClientError(error, functionName = 'UNKNOWN_CLIENT_FUNCTION', context = {}) {
+  const safeError = error instanceof Error
+    ? error
+    : new Error(typeof error === 'string' ? error : 'Unknown client error');
+
+  // Sanitize context to avoid circular references
+  const sanitizedContext = {};
+  if (context && typeof context === 'object') {
+    Object.keys(context).forEach((key) => {
+      const value = context[key];
+      if (value === null || typeof value === 'undefined') {
+        sanitizedContext[key] = value;
+      } else if (typeof value === 'object') {
+        try {
+          sanitizedContext[key] = JSON.parse(JSON.stringify(value));
+        } catch (serializationError) {
+          sanitizedContext[key] = value.toString ? value.toString() : '[object Object]';
+        }
+      } else {
+        sanitizedContext[key] = value;
+      }
+    });
+  }
+
+  const errorPayload = {
+    message: safeError.message,
+    stack: safeError.stack || null,
+    functionName,
+    context: sanitizedContext,
+    location: typeof window !== 'undefined' && window.location ? window.location.href : '',
+    userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+    timestamp: new Date().toISOString()
+  };
+
+  Logger.error('ClientError', `Client error in ${functionName}`, safeError);
+
+  showToast(
+    'حدث خطأ غير متوقع. يرجى تحديث الصفحة أو الاتصال بالدعم الفني.',
+    'error'
+  );
+
+  if (typeof google === 'undefined' || !google.script || !google.script.run) {
+    Logger.warn('ClientError', 'google.script.run unavailable; skipping server logging');
+    return false;
+  }
+
+  try {
+    google.script.run
+      .withFailureHandler((serverError) => {
+        Logger.error('ClientError', 'Failed to forward client error to server', serverError);
+      })
+      .logError_(
+        `CLIENT_SIDE: ${functionName}`,
+        JSON.stringify(errorPayload),
+        errorPayload.stack || errorPayload.message
+      );
+  } catch (forwardError) {
+    Logger.error('ClientError', 'Exception while forwarding client error to server', forwardError);
+  }
+
+  return false;
+}
+
 window.onerror = function(message, source, lineno, colno, error) {
-  console.error('Global Error:', {
-    message: message,
+  const context = {
     source: source,
     line: lineno,
     column: colno,
-    error: error
-  });
-  
-  // Only show toast if the function exists
-  if (typeof showToast === 'function') {
-    showToast(
-      'حدث خطأ غير متوقع. يرجى تحديث الصفحة أو الاتصال بالدعم الفني.',
-      'error'
-    );
-  }
-  
-  return false; // Allow default error handling
+    originalMessage: message
+  };
+  const errorInstance = error instanceof Error ? error : new Error(message || 'Window error');
+  return handleClientError(errorInstance, 'GLOBAL_WINDOW_ONERROR', context);
 };
+
+window.addEventListener('unhandledrejection', (event) => {
+  if (event && typeof event.preventDefault === 'function') {
+    event.preventDefault();
+  }
+  const reason = event && event.reason;
+  const errorInstance = reason instanceof Error
+    ? reason
+    : new Error(typeof reason === 'string' ? reason : 'Unhandled promise rejection');
+  handleClientError(errorInstance, 'GLOBAL_UNHANDLED_REJECTION', {
+    reason: reason && reason.toString ? reason.toString() : String(reason)
+  });
+});
 
 // ----------------------------------------
 // LOGGING UTILITIES
@@ -469,61 +536,207 @@ const FormValidator = {
 // SESSION MANAGEMENT
 // ----------------------------------------
 const Session = {
+  STORAGE_KEY: 'session',
+
   /**
-   * Check if user has active session
-   * @returns {boolean} True if session exists
+   * Safely parse stored JSON
+   * @param {string} value
+   * @param {*} defaultValue
+   * @returns {*}
    */
-  isActive: function() {
-    const sessionData = Utils.getStorage('session');
-    if (!sessionData || !sessionData.token || !sessionData.timestamp) {
+  _parse: function(value, defaultValue = null) {
+    if (!value) {
+      return defaultValue;
+    }
+    try {
+      return JSON.parse(value);
+    } catch (error) {
+      Logger.error('Session', 'Storage parse error', error);
+      return defaultValue;
+    }
+  },
+
+  /**
+   * Read session data from provided storage
+   * @param {Storage} storage
+   * @returns {Object|null}
+   */
+  _readFromStorage: function(storage) {
+    if (!storage) {
+      return null;
+    }
+    try {
+      const raw = storage.getItem(this.STORAGE_KEY);
+      return this._parse(raw, null);
+    } catch (error) {
+      Logger.error('Session', 'Storage read error', error);
+      return null;
+    }
+  },
+
+  /**
+   * Write session data to provided storage
+   * @param {Storage} storage
+   * @param {Object} data
+   * @returns {boolean}
+   */
+  _writeToStorage: function(storage, data) {
+    if (!storage) {
       return false;
     }
-    
-    // Check if session expired (24 hours)
-    const sessionAge = Date.now() - sessionData.timestamp;
-    const maxAge = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-    
+    try {
+      storage.setItem(this.STORAGE_KEY, JSON.stringify(data));
+      return true;
+    } catch (error) {
+      Logger.error('Session', 'Storage write error', error);
+      showToast('تعذر حفظ بيانات الجلسة محلياً', 'warning');
+      return false;
+    }
+  },
+
+  /**
+   * Remove session data from provided storage
+   * @param {Storage} storage
+   */
+  _removeFromStorage: function(storage) {
+    if (!storage) {
+      return;
+    }
+    try {
+      storage.removeItem(this.STORAGE_KEY);
+    } catch (error) {
+      Logger.error('Session', 'Storage remove error', error);
+    }
+  },
+
+  /**
+   * Get the stored session record and storage type
+   * @returns {{data:Object, storage:string}|null}
+   */
+  _getStoredRecord: function() {
+    const sessionStorageRef = (typeof window !== 'undefined' && window.sessionStorage) ? window.sessionStorage : null;
+    const localStorageRef = (typeof window !== 'undefined' && window.localStorage) ? window.localStorage : null;
+    const tempData = this._readFromStorage(sessionStorageRef);
+    if (tempData) {
+      return { data: tempData, storage: 'session' };
+    }
+    const persistentData = this._readFromStorage(localStorageRef);
+    if (persistentData) {
+      return { data: persistentData, storage: 'local' };
+    }
+    return null;
+  },
+
+  /**
+   * Check if user has active session
+   * @returns {boolean}
+   */
+  isActive: function() {
+    const record = this._getStoredRecord();
+    if (!record) {
+      return false;
+    }
+
+    const { data, storage } = record;
+
+    if (!data || !data.token || !data.timestamp) {
+      this.clear();
+      return false;
+    }
+
+    if (data.expiresAt) {
+      const expiryTime = Date.parse(data.expiresAt);
+      if (!Number.isNaN(expiryTime) && Date.now() > expiryTime) {
+        Logger.info('Session', 'Session expired based on server timestamp');
+        this.clear();
+        return false;
+      }
+    }
+
+    const sessionAge = Date.now() - data.timestamp;
+    const maxAge = 24 * 60 * 60 * 1000; // 24 hours
+
     if (sessionAge > maxAge) {
       Logger.info('Session', 'Session expired');
       this.clear();
       return false;
     }
-    
+
+    // Legacy sessions (stored in localStorage without remember-me flag) should be cleared
+    if (storage === 'local' && data.persistent !== true) {
+      Logger.info('Session', 'Clearing legacy session without persistence flag');
+      this.clear();
+      return false;
+    }
+
     return true;
   },
-  
+
   /**
    * Get current session data
-   * @returns {Object|null} Session data or null
+   * @returns {Object|null}
    */
   get: function() {
-    return Utils.getStorage('session');
+    const record = this._getStoredRecord();
+    return record ? record.data : null;
   },
-  
+
   /**
    * Set session data
-   * @param {Object} data - Session data to store
+   * @param {Object} data
+   * @param {Object} options
    */
-  set: function(data) {
+  set: function(data, options = {}) {
+    const persistent = options.persistent === true;
+    let expiresAt = null;
+    if (data.expiresAt) {
+      if (data.expiresAt instanceof Date) {
+        expiresAt = data.expiresAt.toISOString();
+      } else if (typeof data.expiresAt === 'number') {
+        expiresAt = new Date(data.expiresAt).toISOString();
+      } else if (typeof data.expiresAt === 'string') {
+        const parsedExpiry = Date.parse(data.expiresAt);
+        expiresAt = Number.isNaN(parsedExpiry) ? null : new Date(parsedExpiry).toISOString();
+      }
+    }
+
     const sessionData = {
       ...data,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      persistent,
+      expiresAt
     };
-    Utils.setStorage('session', sessionData);
-    Logger.info('Session', 'Session created');
+
+    const sessionStorageRef = (typeof window !== 'undefined' && window.sessionStorage) ? window.sessionStorage : null;
+    const localStorageRef = (typeof window !== 'undefined' && window.localStorage) ? window.localStorage : null;
+
+    if (persistent) {
+      this._removeFromStorage(sessionStorageRef);
+      if (this._writeToStorage(localStorageRef, sessionData)) {
+        Logger.info('Session', 'Session created (persistent)');
+      }
+    } else {
+      this._removeFromStorage(localStorageRef);
+      if (this._writeToStorage(sessionStorageRef, sessionData)) {
+        Logger.info('Session', 'Session created (temporary)');
+      }
+    }
   },
-  
+
   /**
    * Clear session data
    */
   clear: function() {
-    Utils.removeStorage('session');
+    const sessionStorageRef = (typeof window !== 'undefined' && window.sessionStorage) ? window.sessionStorage : null;
+    const localStorageRef = (typeof window !== 'undefined' && window.localStorage) ? window.localStorage : null;
+    this._removeFromStorage(sessionStorageRef);
+    this._removeFromStorage(localStorageRef);
     Logger.info('Session', 'Session cleared');
   },
-  
+
   /**
    * Get current user from session
-   * @returns {Object|null} User data or null
+   * @returns {Object|null}
    */
   getUser: function() {
     const session = this.get();

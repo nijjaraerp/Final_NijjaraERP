@@ -226,10 +226,10 @@ const AuthAPI = {
    * @param {string} password - Password
    * @returns {Promise<Object>} User data and bootstrap data
    */
-  login: function(username, password) {
+  login: function(username, password, clientInfo = {}) {
     return Server.call(
       'authenticateUser',
-      [username, password],
+      [username, password, clientInfo],
       {
         showLoading: true,
         loadingMessage: 'جاري تسجيل الدخول...',
@@ -259,10 +259,10 @@ const AuthAPI = {
    * Logout user and invalidate session
    * @returns {Promise<boolean>} Success status
    */
-  logout: function() {
+  logout: function(sessionToken = null) {
     return Server.call(
       'logoutUser',
-      [],
+      [sessionToken],
       {
         showLoading: true,
         loadingMessage: 'جاري تسجيل الخروج...',

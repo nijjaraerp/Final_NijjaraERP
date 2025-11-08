@@ -7,6 +7,10 @@
 const LoginModule = {
   // State
   isSubmitting: false,
+  workspaceInitialized: false,
+  userMenu: null,
+  userMenuButton: null,
+  userMenuDocumentHandler: null,
   
   /**
    * Safe focus helper (handles cross-origin iframe restrictions)
@@ -189,7 +193,8 @@ const LoginModule = {
     
     try {
       // Call authentication API
-      const response = await AuthAPI.login(username, password);
+      const clientInfo = this.buildClientInfo();
+      const response = await AuthAPI.login(username, password, clientInfo);
       
       Logger.info('Login', 'Authentication successful', response);
       
@@ -206,7 +211,10 @@ const LoginModule = {
         Session.set({
           token: response.sessionToken,
           user: response.user,
-          permissions: response.permissions || []
+          permissions: response.permissions || [],
+          expiresAt: response.expiresAt || null
+        }, {
+          persistent: rememberMe
         });
         
         // Store bootstrap data for workspace
@@ -265,7 +273,12 @@ const LoginModule = {
     
     if (loginView && workspaceView) {
       loginView.classList.add('hidden');
+      loginView.style.display = 'none';
+      
       workspaceView.classList.remove('hidden');
+      workspaceView.style.display = 'flex';
+      
+      this.setupWorkspaceHeader();
       
       // Initialize workspace (to be implemented in future)
       if (typeof WorkspaceModule !== 'undefined' && WorkspaceModule.init) {
@@ -281,34 +294,189 @@ const LoginModule = {
 };
 
 /**
+ * Build client context for server-side logging
+ */
+LoginModule.buildClientInfo = function() {
+  const context = {
+    userAgent: '',
+    timezone: '',
+    language: '',
+    platform: '',
+    screen: ''
+  };
+
+  try {
+    if (typeof navigator !== 'undefined') {
+      context.userAgent = navigator.userAgent || '';
+      context.language = navigator.language || '';
+      context.platform = navigator.platform || '';
+    }
+    if (typeof Intl !== 'undefined' && Intl.DateTimeFormat) {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      context.timezone = tz || '';
+    }
+    if (typeof window !== 'undefined' && window.screen) {
+      context.screen = `${window.screen.width || 0}x${window.screen.height || 0}`;
+    }
+  } catch (error) {
+    Logger.warn('Login', 'Failed to build client context', error);
+  }
+
+  return context;
+};
+
+/**
+ * Prepare workspace header interactions and user context
+ */
+LoginModule.setupWorkspaceHeader = function() {
+  const userMenuButton = document.getElementById('user-menu-button');
+  const userMenu = document.getElementById('user-menu');
+  const logoutLink = document.getElementById('menu-logout');
+
+  if (!userMenuButton || !userMenu) {
+    Logger.warn('Login', 'Workspace header elements missing');
+    return;
+  }
+
+  this.userMenu = userMenu;
+  this.userMenuButton = userMenuButton;
+
+  if (!this.workspaceInitialized) {
+    this.userMenuButton.setAttribute('aria-expanded', 'false');
+
+    const toggleHandler = (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      this.toggleUserMenu();
+    };
+
+    const outsideClickHandler = (event) => {
+      if (!this.userMenu || !this.userMenuButton) {
+        return;
+      }
+      if (this.userMenu.contains(event.target) || this.userMenuButton.contains(event.target)) {
+        return;
+      }
+      this.toggleUserMenu(false);
+    };
+
+    this.userMenuButton.addEventListener('click', toggleHandler);
+    document.addEventListener('click', outsideClickHandler);
+
+    this.userMenuDocumentHandler = outsideClickHandler;
+
+    if (logoutLink && !logoutLink.dataset.boundLogout) {
+      logoutLink.addEventListener('click', (event) => {
+        event.preventDefault();
+        this.toggleUserMenu(false);
+        handleLogout();
+      });
+      logoutLink.dataset.boundLogout = 'true';
+    }
+
+    this.workspaceInitialized = true;
+  }
+
+  this.toggleUserMenu(false);
+  this.updateUserContext();
+};
+
+/**
+ * Toggle user menu visibility
+ * @param {boolean} [forceState]
+ */
+LoginModule.toggleUserMenu = function(forceState) {
+  if (!this.userMenu || !this.userMenuButton) {
+    return;
+  }
+
+  const isCurrentlyOpen = this.userMenu.classList.contains('open');
+  const shouldOpen = typeof forceState === 'boolean' ? forceState : !isCurrentlyOpen;
+
+  if (shouldOpen) {
+    this.userMenu.style.display = 'block';
+    this.userMenu.classList.add('open');
+    this.userMenuButton.setAttribute('aria-expanded', 'true');
+  } else {
+    this.userMenu.style.display = 'none';
+    this.userMenu.classList.remove('open');
+    this.userMenuButton.setAttribute('aria-expanded', 'false');
+  }
+};
+
+/**
+ * Update user info displayed in the header
+ */
+LoginModule.updateUserContext = function() {
+  const session = Session.get();
+  const user = session ? session.user : null;
+
+  const nameElement = document.getElementById('user-display-name');
+  const roleElement = document.getElementById('user-role');
+
+  if (nameElement) {
+    const displayName = user && (user.displayName || user.fullName || user.name || user.username);
+    nameElement.textContent = displayName || 'مستخدم النظام';
+  }
+
+  if (roleElement) {
+    const role = user && (user.role || user.jobTitle || user.position);
+    roleElement.textContent = role || '---';
+  }
+};
+
+/**
  * Check session on page load
  */
-function checkSession() {
+async function checkSession() {
   Logger.info('Login', 'Checking existing session');
   
-  if (Session.isActive()) {
-    Logger.info('Login', 'Active session found, navigating to workspace');
-    
-    const loginView = document.getElementById('login-view');
-    const workspaceView = document.getElementById('workspace-view');
-    
-    if (loginView && workspaceView) {
-      loginView.classList.add('hidden');
-      workspaceView.classList.remove('hidden');
-      
-      // Initialize workspace
-      if (typeof WorkspaceModule !== 'undefined' && WorkspaceModule.init) {
-        WorkspaceModule.init();
+  const loginView = document.getElementById('login-view');
+  const workspaceView = document.getElementById('workspace-view');
+  const storedSession = Session.get();
+  
+  try {
+    if (Session.isActive() && storedSession && storedSession.token) {
+      Logger.info('Login', 'Active session found, verifying with server');
+      const verification = await AuthAPI.verifySession(storedSession.token);
+      if (verification && verification.valid) {
+        const updatedSession = {
+          ...storedSession,
+          expiresAt: verification.expiresAt || storedSession.expiresAt || null
+        };
+        Session.set(updatedSession, {
+          persistent: storedSession.persistent === true
+        });
+        LoginModule.navigateToWorkspace();
+        showToast('مرحباً بعودتك!', 'info', 2000);
+        return;
       }
-      
-      showToast('مرحباً بعودتك!', 'info', 2000);
+      Logger.warn('Login', 'Stored session invalid or expired. Clearing session.');
+      Session.clear();
+      Utils.removeStorage('bootstrapData');
     }
-  } else {
-    Logger.info('Login', 'No active session, showing login view');
-    
-    // Initialize login module
-    LoginModule.init();
+  } catch (error) {
+    Logger.warn('Login', 'Session verification failed', error);
+    Session.clear();
+    Utils.removeStorage('bootstrapData');
   }
+
+  Logger.info('Login', 'No active session, showing login view');
+  
+  // Ensure login view is visible
+  if (loginView) {
+    loginView.classList.remove('hidden');
+    loginView.style.display = 'block';
+  }
+  
+  // Ensure workspace is hidden
+  if (workspaceView) {
+    workspaceView.classList.add('hidden');
+    workspaceView.style.display = 'none';
+  }
+  
+  // Initialize login module
+  LoginModule.init();
 }
 
 /**
@@ -323,9 +491,15 @@ async function handleLogout() {
     return;
   }
   
+  let rememberedUsername = null;
+  
   try {
+    // Preserve remembered username before clearing storage
+    rememberedUsername = Utils.getStorage('rememberedUsername');
+
     // Call server logout (optional - to invalidate session on server)
-    await AuthAPI.logout().catch(err => {
+    const activeSession = Session.get();
+    await AuthAPI.logout(activeSession ? activeSession.token : null).catch(err => {
       Logger.warn('Login', 'Server logout failed, continuing client-side logout', err);
     });
     
@@ -335,6 +509,9 @@ async function handleLogout() {
     // Clear client-side session regardless of server response
     Session.clear();
     Utils.clearStorage();
+    if (rememberedUsername) {
+      Utils.setStorage('rememberedUsername', rememberedUsername);
+    }
     
     Logger.info('Login', 'Logout completed');
     showToast('تم تسجيل الخروج بنجاح', 'success', 2000);
