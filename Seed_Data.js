@@ -1,7 +1,12 @@
 /**
  * @file Seed_Data.js
- * @description Populates initial core data (roles, employees, admin user) for Nijjara ERP.
- * Run AFTER schema setup. Provides rollback on failure to maintain integrity.
+ * @description Populates ALL initial data for Nijjara ERP.
+ * Run AFTER Setup.js schema setup. Provides rollback on failure to maintain integrity.
+ * 
+ * EXECUTION ORDER:
+ * 1. Setup.js - runInitialSetup() - Creates all sheets and headers
+ * 2. Seed_Data.js - runSeedAllData() - Seeds ALL initial data
+ * 3. Seed_Functions.js - runApplyAllFormulas() - Links Arabic columns to English
  */
 
 // ---------------------------------------------------------------------------
@@ -58,26 +63,215 @@ function generateSequentialId_(sheet, headers, idColumnName, prefix) {
 // ---------------------------------------------------------------------------
 
 /**
- * Master seeding function. Executes in dependency order with rollback.
- * Order: Roles -> Employee -> Admin User.
+ * Master seeding function. Executes ALL seeding in dependency order with rollback.
+ * Order: Settings → Dropdowns → Departments → Roles → Permissions → Employee → Admin User
  */
 function runSeedAllData() {
-	logInfo_('runSeedAllData', 'Starting master seed process');
+	logInfo_('runSeedAllData', 'Starting COMPLETE seed process for ALL data');
 	const ss = SpreadsheetApp.getActiveSpreadsheet();
-
 	const rollbackStack = []; // Each entry: { sheetName, rowNumber }
 
 	try {
+		// 1. Seed System Settings
+		seedSystemSettings_(ss, rollbackStack);
+		
+		// 2. Seed Dropdowns
+		seedDropdowns_(ss, rollbackStack);
+		
+		// 3. Seed Departments
+		seedDepartments_(ss, rollbackStack);
+		
+		// 4. Seed Roles
 		const roleId = seedRoles_(ss, rollbackStack);
+		
+		// 5. Seed Permissions
+		seedPermissions_(ss, rollbackStack);
+		
+		// 6. Seed Employee
 		const employeeId = seedEmployee_(ss, rollbackStack);
+		
+		// 7. Seed Admin User
 		seedAdminUser_(ss, roleId, employeeId, rollbackStack);
 
-		logInfo_('runSeedAllData', 'Seed process completed successfully');
+		logInfo_('runSeedAllData', 'COMPLETE seed process finished successfully');
+		logInfo_('runSeedAllData', '✅ ALL DATA SEEDED - System ready for use');
+		
 	} catch (e) {
 		logError_('runSeedAllData', 'Seeding failed. Initiating rollback.', e);
 		rollback_(ss, rollbackStack);
 		throw e; // Surface failure for visibility.
 	}
+}
+
+// ---------------------------------------------------------------------------
+// --- SYSTEM SETTINGS SEEDING ---
+// ---------------------------------------------------------------------------
+
+/**
+ * Seeds essential system settings.
+ * @param {SpreadsheetApp.Spreadsheet} ss
+ * @param {Array} rollbackStack
+ */
+function seedSystemSettings_(ss, rollbackStack) {
+	const sheet = getSheetOrThrow_(ss, 'SET_Settings');
+	const headers = getHeaders_(sheet);
+	
+	// Check if already seeded
+	const data = getDataBody_(sheet, headers);
+	if (data.length > 0) {
+		logInfo_('seedSystemSettings_', 'System settings already exist. Skipping.');
+		return;
+	}
+	
+	const settings = [
+		{ setting_key: 'company_name', setting_value: 'Nijjara ERP Company', description: 'Company name for reports and branding' },
+		{ setting_key: 'default_currency', setting_value: 'EGP', description: 'Default currency for financial calculations' },
+		{ setting_key: 'fiscal_year_start', setting_value: '01-01', description: 'Fiscal year start date (MM-DD)' },
+		{ setting_key: 'timezone', setting_value: 'Africa/Cairo', description: 'System timezone' },
+		{ setting_key: 'date_format', setting_value: 'DD/MM/YYYY', description: 'Default date format' },
+		{ setting_key: 'language', setting_value: 'ar', description: 'Default system language' }
+	];
+	
+	settings.forEach(setting => {
+		const newRow = buildRow_(headers, setting);
+		sheet.appendRow(newRow);
+		rollbackStack.push({ sheetName: 'SET_Settings', rowNumber: sheet.getLastRow() });
+	});
+	
+	logInfo_('seedSystemSettings_', `Seeded ${settings.length} system settings`);
+}
+
+// ---------------------------------------------------------------------------
+// --- DROPDOWNS SEEDING ---
+// ---------------------------------------------------------------------------
+
+/**
+ * Seeds dropdown values for the system.
+ * @param {SpreadsheetApp.Spreadsheet} ss
+ * @param {Array} rollbackStack
+ */
+function seedDropdowns_(ss, rollbackStack) {
+	const sheet = getSheetOrThrow_(ss, 'SET_Dropdowns');
+	const headers = getHeaders_(sheet);
+	
+	// Check if already seeded
+	const data = getDataBody_(sheet, headers);
+	if (data.length > 0) {
+		logInfo_('seedDropdowns_', 'Dropdowns already exist. Skipping.');
+		return;
+	}
+	
+	const dropdowns = [
+		// Leave types
+		{ list_id: 'leave_type', value_engine: 'annual', display_arabic: 'إجازة سنوية', sort_order: 1 },
+		{ list_id: 'leave_type', value_engine: 'sick', display_arabic: 'إجازة مرضية', sort_order: 2 },
+		{ list_id: 'leave_type', value_engine: 'emergency', display_arabic: 'إجازة طارئة', sort_order: 3 },
+		{ list_id: 'leave_type', value_engine: 'maternity', display_arabic: 'إجازة أمومة', sort_order: 4 },
+		// Project status
+		{ list_id: 'project_status', value_engine: 'planning', display_arabic: 'تخطيط', sort_order: 1 },
+		{ list_id: 'project_status', value_engine: 'active', display_arabic: 'نشط', sort_order: 2 },
+		{ list_id: 'project_status', value_engine: 'on_hold', display_arabic: 'متوقف', sort_order: 3 },
+		{ list_id: 'project_status', value_engine: 'completed', display_arabic: 'مكتمل', sort_order: 4 },
+		{ list_id: 'project_status', value_engine: 'cancelled', display_arabic: 'ملغي', sort_order: 5 },
+		// Task priority
+		{ list_id: 'task_priority', value_engine: 'low', display_arabic: 'منخفضة', sort_order: 1 },
+		{ list_id: 'task_priority', value_engine: 'medium', display_arabic: 'متوسطة', sort_order: 2 },
+		{ list_id: 'task_priority', value_engine: 'high', display_arabic: 'عالية', sort_order: 3 },
+		{ list_id: 'task_priority', value_engine: 'urgent', display_arabic: 'عاجلة', sort_order: 4 },
+		// Expense categories
+		{ list_id: 'expense_category', value_engine: 'materials', display_arabic: 'مواد', sort_order: 1 },
+		{ list_id: 'expense_category', value_engine: 'labor', display_arabic: 'عمالة', sort_order: 2 },
+		{ list_id: 'expense_category', value_engine: 'equipment', display_arabic: 'معدات', sort_order: 3 },
+		{ list_id: 'expense_category', value_engine: 'transportation', display_arabic: 'مواصلات', sort_order: 4 },
+		{ list_id: 'expense_category', value_engine: 'other', display_arabic: 'أخرى', sort_order: 5 }
+	];
+	
+	dropdowns.forEach(dropdown => {
+		const newRow = buildRow_(headers, dropdown);
+		sheet.appendRow(newRow);
+		rollbackStack.push({ sheetName: 'SET_Dropdowns', rowNumber: sheet.getLastRow() });
+	});
+	
+	logInfo_('seedDropdowns_', `Seeded ${dropdowns.length} dropdown values`);
+}
+
+// ---------------------------------------------------------------------------
+// --- DEPARTMENTS SEEDING ---
+// ---------------------------------------------------------------------------
+
+/**
+ * Seeds sample departments.
+ * @param {SpreadsheetApp.Spreadsheet} ss
+ * @param {Array} rollbackStack
+ */
+function seedDepartments_(ss, rollbackStack) {
+	const sheet = getSheetOrThrow_(ss, 'HRM_Departments');
+	const headers = getHeaders_(sheet);
+	
+	// Check if already seeded
+	const data = getDataBody_(sheet, headers);
+	if (data.length > 0) {
+		logInfo_('seedDepartments_', 'Departments already exist. Skipping.');
+		return;
+	}
+	
+	const departments = [
+		{ department_id: generateSequentialId_(sheet, headers, 'department_id', 'DEPT'), department_name_english: 'Human Resources', manager_employee_id: '', created_at: new Date(), is_deleted: false, record_notes: 'Auto-generated' },
+		{ department_id: generateSequentialId_(sheet, headers, 'department_id', 'DEPT'), department_name_english: 'Information Technology', manager_employee_id: '', created_at: new Date(), is_deleted: false, record_notes: 'Auto-generated' },
+		{ department_id: generateSequentialId_(sheet, headers, 'department_id', 'DEPT'), department_name_english: 'Finance', manager_employee_id: '', created_at: new Date(), is_deleted: false, record_notes: 'Auto-generated' },
+		{ department_id: generateSequentialId_(sheet, headers, 'department_id', 'DEPT'), department_name_english: 'Operations', manager_employee_id: '', created_at: new Date(), is_deleted: false, record_notes: 'Auto-generated' },
+		{ department_id: generateSequentialId_(sheet, headers, 'department_id', 'DEPT'), department_name_english: 'Sales', manager_employee_id: '', created_at: new Date(), is_deleted: false, record_notes: 'Auto-generated' }
+	];
+	
+	departments.forEach(dept => {
+		const newRow = buildRow_(headers, dept);
+		sheet.appendRow(newRow);
+		rollbackStack.push({ sheetName: 'HRM_Departments', rowNumber: sheet.getLastRow() });
+	});
+	
+	logInfo_('seedDepartments_', `Seeded ${departments.length} departments`);
+}
+
+// ---------------------------------------------------------------------------
+// --- PERMISSIONS SEEDING ---
+// ---------------------------------------------------------------------------
+
+/**
+ * Seeds system permissions.
+ * @param {SpreadsheetApp.Spreadsheet} ss
+ * @param {Array} rollbackStack
+ */
+function seedPermissions_(ss, rollbackStack) {
+	const sheet = getSheetOrThrow_(ss, 'SYS_Permissions');
+	const headers = getHeaders_(sheet);
+	
+	// Check if already seeded
+	const data = getDataBody_(sheet, headers);
+	if (data.length > 0) {
+		logInfo_('seedPermissions_', 'Permissions already exist. Skipping.');
+		return;
+	}
+	
+	const permissions = [
+		{ permission_id: 'users_create', permission_group: 'Users', description: 'Create new users', created_at: new Date(), is_deleted: false },
+		{ permission_id: 'users_read', permission_group: 'Users', description: 'View users', created_at: new Date(), is_deleted: false },
+		{ permission_id: 'users_update', permission_group: 'Users', description: 'Edit user information', created_at: new Date(), is_deleted: false },
+		{ permission_id: 'users_delete', permission_group: 'Users', description: 'Delete users', created_at: new Date(), is_deleted: false },
+		{ permission_id: 'hr_read', permission_group: 'HR', description: 'View HR data', created_at: new Date(), is_deleted: false },
+		{ permission_id: 'hr_manage', permission_group: 'HR', description: 'Manage HR data', created_at: new Date(), is_deleted: false },
+		{ permission_id: 'projects_read', permission_group: 'Projects', description: 'View projects', created_at: new Date(), is_deleted: false },
+		{ permission_id: 'projects_manage', permission_group: 'Projects', description: 'Manage projects', created_at: new Date(), is_deleted: false },
+		{ permission_id: 'finance_read', permission_group: 'Finance', description: 'View financial data', created_at: new Date(), is_deleted: false },
+		{ permission_id: 'finance_manage', permission_group: 'Finance', description: 'Manage financial data', created_at: new Date(), is_deleted: false }
+	];
+	
+	permissions.forEach(perm => {
+		const newRow = buildRow_(headers, perm);
+		sheet.appendRow(newRow);
+		rollbackStack.push({ sheetName: 'SYS_Permissions', rowNumber: sheet.getLastRow() });
+	});
+	
+	logInfo_('seedPermissions_', `Seeded ${permissions.length} permissions`);
 }
 
 // ---------------------------------------------------------------------------
