@@ -13,13 +13,13 @@ function TEST_createAdminUser() {
   console.log('========================================');
   
   const adminData = {
-    EMP_Name_EN: 'System Administrator',
-    USR_Name: 'admin',
-    EMP_Email: 'admin@nijjara.local',
+    EMP_Name_EN: 'Mohamed Sherif Elkhoraiby',
+    USR_Name: 'mkhoraiby',
+    EMP_Email: 'nijjaraerp@gmail.com',
     Job_Title: 'System Administrator',
     DEPT_Name: 'IT',
     ROL_ID: 'ROL-ADMIN',
-    Password: 'Admin@123',  // Meets strength requirements
+    Password: '210388',
     USR_Is_Active: true
   };
   
@@ -52,8 +52,8 @@ function TEST_loginFlow() {
   console.log('TEST: Complete Login Flow');
   console.log('========================================');
   
-  const username = 'admin';
-  const password = 'Admin@123';
+  const username = 'mkhoraiby';
+  const password = '210388';
   
   console.log('Step 1: Authenticating user...');
   const authResult = authenticateUser(username, password);
@@ -100,7 +100,7 @@ function TEST_permissions() {
   console.log('========================================');
   
   // Get admin user
-  const userResult = getUserByUsername('admin');
+  const userResult = getUserByUsername('mkhoraiby');
   
   if (!userResult.success) {
     console.error('❌ Failed to get admin user');
@@ -207,15 +207,15 @@ function TEST_runAllDay4Tests() {
  * Quick test to check if admin user already exists
  */
 function TEST_checkAdminExists() {
-  console.log('Checking if admin user exists...');
+  console.log('Checking if mkhoraiby user exists...');
   
-  const result = getUserByUsername('admin');
+  const result = getUserByUsername('mkhoraiby');
   
   if (result.success) {
-    console.log('✅ Admin user exists:');
+    console.log('✅ User exists:');
     console.log(JSON.stringify(result.data, null, 2));
   } else {
-    console.log('❌ Admin user does not exist');
+    console.log('❌ User does not exist');
     console.log('Run TEST_createAdminUser() to create it');
   }
   

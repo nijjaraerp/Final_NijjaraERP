@@ -107,10 +107,13 @@ function validatePasswordStrength(password) {
     return { valid: false, errors: errors };
   }
   
-  if (password.length < 8) {
-    errors.push('Password must be at least 8 characters long');
+  if (password.length < 6) {
+    errors.push('Password must be at least 6 characters long');
   }
   
+  // Relaxed validation - only require length
+  // Future: Can re-enable strict validation if needed
+  /*
   if (!/[A-Z]/.test(password)) {
     errors.push('Password must contain at least one uppercase letter');
   }
@@ -122,6 +125,7 @@ function validatePasswordStrength(password) {
   if (!/[0-9]/.test(password)) {
     errors.push('Password must contain at least one number');
   }
+  */
   
   return {
     valid: errors.length === 0,

@@ -1,276 +1,831 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تسجيل الدخول - Nijjara ERP</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<!DOCTYPE html><!DOCTYPE html>
+
+<html lang="ar" dir="rtl"><html lang="ar" dir="rtl">
+
+<head><head>
+
+  <meta charset="UTF-8">  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Nijjara ERP - Premium Login</title>  <title>تسجيل الدخول - Nijjara ERP</title>
+
+  <style>  <style>
+
+    * {    * {
+
+      margin: 0;      margin: 0;
+
+      padding: 0;      padding: 0;
+
+      box-sizing: border-box;      box-sizing: border-box;
+
+    }    }
+
     
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      direction: rtl;
-    }
-    
-    .login-container {
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
-      width: 400px;
+
+    :root {    body {
+
+      --dark-bg: #0a0e27;      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+      --darker-bg: #060920;      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+      --card-bg: rgba(15, 23, 42, 0.7);      min-height: 100vh;
+
+      --primary-gold: #d4af37;      display: flex;
+
+      --primary-blue: #1e40af;      justify-content: center;
+
+      --accent-cyan: #06b6d4;      align-items: center;
+
+      --accent-purple: #7c3aed;      direction: rtl;
+
+      --text-primary: #f1f5f9;    }
+
+      --text-secondary: #94a3b8;    
+
+      --error-red: #ef4444;    .login-container {
+
+      --success-green: #10b981;      background: white;
+
+      --glass-border: rgba(255, 255, 255, 0.1);      border-radius: 10px;
+
+      --shadow-glow: rgba(212, 175, 55, 0.15);      box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+
+    }      width: 400px;
+
       max-width: 90%;
-      padding: 40px;
-    }
-    
-    .logo {
-      text-align: center;
+
+    @keyframes float {      padding: 40px;
+
+      0%, 100% { transform: translateY(0px) rotate(0deg); }    }
+
+      33% { transform: translateY(-20px) rotate(3deg); }    
+
+      66% { transform: translateY(-10px) rotate(-3deg); }    .logo {
+
+    }      text-align: center;
+
       margin-bottom: 30px;
-    }
-    
-    .logo h1 {
-      color: #667eea;
-      font-size: 32px;
+
+    @keyframes gradient-shift {    }
+
+      0% { background-position: 0% 50%; }    
+
+      50% { background-position: 100% 50%; }    .logo h1 {
+
+      100% { background-position: 0% 50%; }      color: #667eea;
+
+    }      font-size: 32px;
+
       margin-bottom: 5px;
-    }
-    
-    .logo p {
-      color: #666;
+
+    @keyframes glow-pulse {    }
+
+      0%, 100% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.3); }    
+
+      50% { box-shadow: 0 0 40px rgba(212, 175, 55, 0.6); }    .logo p {
+
+    }      color: #666;
+
       font-size: 14px;
-    }
-    
-    .form-group {
-      margin-bottom: 20px;
-    }
-    
-    label {
-      display: block;
-      margin-bottom: 5px;
-      color: #333;
+
+    @keyframes slide-in {    }
+
+      from {    
+
+        opacity: 0;    .form-group {
+
+        transform: translateY(30px);      margin-bottom: 20px;
+
+      }    }
+
+      to {    
+
+        opacity: 1;    label {
+
+        transform: translateY(0);      display: block;
+
+      }      margin-bottom: 5px;
+
+    }      color: #333;
+
       font-weight: 600;
-    }
-    
-    input[type="text"],
-    input[type="password"] {
+
+    @keyframes shimmer {    }
+
+      0% { background-position: -1000px 0; }    
+
+      100% { background-position: 1000px 0; }    input[type="text"],
+
+    }    input[type="password"] {
+
       width: 100%;
-      padding: 12px;
-      border: 2px solid #ddd;
-      border-radius: 5px;
-      font-size: 16px;
-      transition: border-color 0.3s;
-      direction: ltr;
-      text-align: left;
-    }
-    
-    input[type="text"]:focus,
-    input[type="password"]:focus {
-      outline: none;
-      border-color: #667eea;
-    }
-    
+
+    body {      padding: 12px;
+
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;      border: 2px solid #ddd;
+
+      background: linear-gradient(135deg,       border-radius: 5px;
+
+        var(--darker-bg) 0%,       font-size: 16px;
+
+        var(--dark-bg) 50%,       transition: border-color 0.3s;
+
+        #0f1729 100%);      direction: ltr;
+
+      background-size: 400% 400%;      text-align: left;
+
+      animation: gradient-shift 15s ease infinite;    }
+
+      min-height: 100vh;    
+
+      display: flex;    input[type="text"]:focus,
+
+      justify-content: center;    input[type="password"]:focus {
+
+      align-items: center;      outline: none;
+
+      overflow: hidden;      border-color: #667eea;
+
+      position: relative;    }
+
+    }    
+
     .btn {
-      width: 100%;
-      padding: 12px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
+
+    /* Animated background particles */      width: 100%;
+
+    .bg-particle {      padding: 12px;
+
+      position: absolute;      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+      border-radius: 50%;      color: white;
+
+      opacity: 0.1;      border: none;
+
+      animation: float 20s infinite ease-in-out;      border-radius: 5px;
+
+    }      font-size: 16px;
+
       font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    
-    .btn:hover {
-      transform: translateY(-2px);
-    }
-    
+
+    .particle-1 {      cursor: pointer;
+
+      width: 300px;      transition: transform 0.2s;
+
+      height: 300px;    }
+
+      background: radial-gradient(circle, var(--primary-gold) 0%, transparent 70%);    
+
+      top: -150px;    .btn:hover {
+
+      right: -150px;      transform: translateY(-2px);
+
+      animation-delay: 0s;    }
+
+    }    
+
     .btn:active {
-      transform: translateY(0);
-    }
+
+    .particle-2 {      transform: translateY(0);
+
+      width: 400px;    }
+
+      height: 400px;    
+
+      background: radial-gradient(circle, var(--accent-cyan) 0%, transparent 70%);    .btn:disabled {
+
+      bottom: -200px;      opacity: 0.6;
+
+      left: -200px;      cursor: not-allowed;
+
+      animation-delay: 5s;      transform: none;
+
+    }    }
+
     
-    .btn:disabled {
-      opacity: 0.6;
+
+    .particle-3 {    .message {
+
+      width: 250px;      margin-top: 15px;
+
+      height: 250px;      padding: 10px;
+
+      background: radial-gradient(circle, var(--accent-purple) 0%, transparent 70%);      border-radius: 5px;
+
+      top: 50%;      display: none;
+
+      left: 50%;      text-align: center;
+
+      transform: translate(-50%, -50%);    }
+
+      animation-delay: 10s;    
+
+    }    .message.error {
+
+      background-color: #fee;
+
+    .login-container {      color: #c33;
+
+      position: relative;      border: 1px solid #fcc;
+
+      z-index: 10;    }
+
+      width: 90%;    
+
+      max-width: 480px;    .message.success {
+
+      animation: slide-in 0.8s cubic-bezier(0.16, 1, 0.3, 1);      background-color: #efe;
+
+    }      color: #3c3;
+
+      border: 1px solid #cfc;
+
+    .login-card {    }
+
+      background: var(--card-bg);    
+
+      backdrop-filter: blur(20px) saturate(180%);    .message.warning {
+
+      -webkit-backdrop-filter: blur(20px) saturate(180%);      background-color: #ffc;
+
+      border-radius: 24px;      color: #c93;
+
+      border: 1px solid var(--glass-border);      border: 1px solid #fec;
+
+      padding: 48px 40px;    }
+
+      box-shadow:     
+
+        0 20px 60px rgba(0, 0, 0, 0.6),    .spinner {
+
+        0 0 80px var(--shadow-glow),      border: 3px solid #f3f3f3;
+
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);      border-top: 3px solid #667eea;
+
+      position: relative;      border-radius: 50%;
+
+      overflow: hidden;      width: 20px;
+
+    }      height: 20px;
+
+      animation: spin 1s linear infinite;
+
+    .login-card::before {      display: inline-block;
+
+      content: '';      margin-left: 10px;
+
+      position: absolute;      display: none;
+
+      top: 0;    }
+
+      left: -100%;    
+
+      width: 100%;    @keyframes spin {
+
+      height: 100%;      0% { transform: rotate(0deg); }
+
+      background: linear-gradient(      100% { transform: rotate(360deg); }
+
+        90deg,    }
+
+        transparent,    
+
+        rgba(255, 255, 255, 0.03),    .footer {
+
+        transparent      margin-top: 20px;
+
+      );      text-align: center;
+
+      animation: shimmer 3s infinite;      color: #666;
+
+    }      font-size: 12px;
+
+    }
+
+    .logo-container {  </style>
+
+      text-align: center;</head>
+
+      margin-bottom: 36px;<body>
+
+    }  <div class="login-container">
+
+    <div class="logo">
+
+    .logo-icon {      <h1>🏢 Nijjara ERP</h1>
+
+      width: 80px;      <p>نظام تخطيط موارد المؤسسة</p>
+
+      height: 80px;    </div>
+
+      margin: 0 auto 16px;    
+
+      background: linear-gradient(135deg, var(--primary-gold), var(--accent-cyan));    <form id="loginForm">
+
+      border-radius: 20px;      <div class="form-group">
+
+      display: flex;        <label for="username">اسم المستخدم</label>
+
+      align-items: center;        <input type="text" id="username" name="username" required autocomplete="username">
+
+      justify-content: center;      </div>
+
+      font-size: 42px;      
+
+      box-shadow:       <div class="form-group">
+
+        0 10px 30px rgba(212, 175, 55, 0.3),        <label for="password">كلمة المرور</label>
+
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);        <input type="password" id="password" name="password" required autocomplete="current-password">
+
+      animation: glow-pulse 3s infinite;      </div>
+
+      position: relative;      
+
+    }      <button type="submit" class="btn" id="loginBtn">
+
+        <span id="btnText">تسجيل الدخول</span>
+
+    .logo-icon::after {        <span class="spinner" id="spinner"></span>
+
+      content: '⚡';      </button>
+
+      position: absolute;      
+
+      font-size: 28px;      <div class="message" id="message"></div>
+
+      color: var(--darker-bg);    </form>
+
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);    
+
+    }    <div class="footer">
+
+      <p>&copy; 2025 Nijjara Company. All rights reserved.</p>
+
+    .brand-title {    </div>
+
+      font-size: 32px;  </div>
+
+      font-weight: 700;
+
+      background: linear-gradient(135deg, var(--primary-gold), var(--accent-cyan), var(--accent-purple));  <script>
+
+      background-size: 200% auto;    // Include debug.js functions inline for now
+
+      -webkit-background-clip: text;    const DBG = {
+
+      -webkit-text-fill-color: transparent;      log: function(level, scope, msg, data) {
+
+      background-clip: text;        const timestamp = new Date().toLocaleTimeString();
+
+      margin-bottom: 8px;        const message = `[CLIENT][${level}] ${timestamp} ${scope} → ${msg}`;
+
+      letter-spacing: 1px;        console.log(message, data || '');
+
+    }      },
+
+      info: function(scope, msg, data) { this.log('INFO', scope, msg, data); },
+
+    .brand-subtitle {      error: function(scope, msg, data) { this.log('ERR', scope, msg, data); },
+
+      color: var(--text-secondary);      success: function(scope, msg, data) { this.log('OK', scope, msg, data); },
+
+      font-size: 14px;      warn: function(scope, msg, data) { this.log('WARN', scope, msg, data); }
+
+      font-weight: 400;    };
+
+      letter-spacing: 2px;    
+
+    }    document.getElementById('loginForm').addEventListener('submit', function(e) {
+
+      e.preventDefault();
+
+    .form-group {      
+
+      margin-bottom: 24px;      const username = document.getElementById('username').value;
+
+      position: relative;      const password = document.getElementById('password').value;
+
+    }      const loginBtn = document.getElementById('loginBtn');
+
+      const btnText = document.getElementById('btnText');
+
+    .form-label {      const spinner = document.getElementById('spinner');
+
+      display: block;      const message = document.getElementById('message');
+
+      color: var(--text-secondary);      
+
+      font-size: 13px;      // Validate inputs
+
+      font-weight: 500;      if (!username || !password) {
+
+      margin-bottom: 8px;        showMessage('error', 'الرجاء إدخال اسم المستخدم وكلمة المرور');
+
+      letter-spacing: 0.5px;        return;
+
+      text-transform: uppercase;      }
+
+    }      
+
+      // Disable button and show loading
+
+    .form-input {      loginBtn.disabled = true;
+
+      width: 100%;      btnText.textContent = 'جاري التحقق...';
+
+      padding: 16px 20px;      spinner.style.display = 'inline-block';
+
+      background: rgba(15, 23, 42, 0.6);      message.style.display = 'none';
+
+      border: 1.5px solid var(--glass-border);      
+
+      border-radius: 12px;      DBG.info('Login', 'Attempting login', { username: username });
+
+      color: var(--text-primary);      
+
+      font-size: 15px;      // Call server-side authentication
+
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);      google.script.run
+
+      backdrop-filter: blur(10px);        .withSuccessHandler(function(response) {
+
+    }          DBG.success('Login', 'Server response received', response);
+
+          
+
+    .form-input:focus {          if (response.success) {
+
+      outline: none;            showMessage('success', 'تم تسجيل الدخول بنجاح! جاري التحميل...');
+
+      border-color: var(--primary-gold);            DBG.success('Login', 'Authentication successful', response.data);
+
+      background: rgba(15, 23, 42, 0.8);            
+
+      box-shadow:             // Store session token
+
+        0 0 0 3px rgba(212, 175, 55, 0.1),            sessionStorage.setItem('sessionToken', response.data.sessionToken);
+
+        0 4px 12px rgba(212, 175, 55, 0.2);            sessionStorage.setItem('userId', response.data.userId);
+
+      transform: translateY(-2px);            sessionStorage.setItem('username', response.data.username);
+
+    }            
+
+            // Redirect to dashboard (will be implemented later)
+
+    .form-input::placeholder {            setTimeout(function() {
+
+      color: var(--text-secondary);              showMessage('success', 'لوحة التحكم قيد التطوير حالياً');
+
+      opacity: 0.6;              resetForm();
+
+    }            }, 2000);
+
+          } else {
+
+    .login-button {            showMessage('error', response.message || 'فشل تسجيل الدخول');
+
+      width: 100%;            DBG.error('Login', 'Authentication failed', response.errors);
+
+      padding: 16px;            resetForm();
+
+      background: linear-gradient(135deg, var(--primary-gold), #c49a2a);          }
+
+      border: none;        })
+
+      border-radius: 12px;        .withFailureHandler(function(error) {
+
+      color: var(--darker-bg);          DBG.error('Login', 'Server error', error);
+
+      font-size: 16px;          showMessage('error', 'حدث خطأ في الاتصال بالخادم');
+
+      font-weight: 600;          resetForm();
+
+      letter-spacing: 1px;        })
+
+      cursor: pointer;        .authenticateUser(username, password, 'Web');
+
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);    });
+
+      box-shadow:     
+
+        0 6px 20px rgba(212, 175, 55, 0.4),    function showMessage(type, text) {
+
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);      const message = document.getElementById('message');
+
+      position: relative;      message.className = 'message ' + type;
+
+      overflow: hidden;      message.textContent = text;
+
+    }      message.style.display = 'block';
+
+    }
+
+    .login-button::before {    
+
+      content: '';    function resetForm() {
+
+      position: absolute;      const loginBtn = document.getElementById('loginBtn');
+
+      top: 0;      const btnText = document.getElementById('btnText');
+
+      left: -100%;      const spinner = document.getElementById('spinner');
+
+      width: 100%;      
+
+      height: 100%;      loginBtn.disabled = false;
+
+      background: linear-gradient(      btnText.textContent = 'تسجيل الدخول';
+
+        90deg,      spinner.style.display = 'none';
+
+        transparent,    }
+
+        rgba(255, 255, 255, 0.3),  </script>
+
+        transparent</body>
+
+      );</html>
+
+      transition: left 0.5s;
+    }
+
+    .login-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 
+        0 10px 30px rgba(212, 175, 55, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+
+    .login-button:hover::before {
+      left: 100%;
+    }
+
+    .login-button:active {
+      transform: translateY(-1px);
+    }
+
+    .login-button:disabled {
+      opacity: 0.5;
       cursor: not-allowed;
       transform: none;
     }
-    
-    .message {
-      margin-top: 15px;
-      padding: 10px;
-      border-radius: 5px;
+
+    .loading-spinner {
       display: none;
-      text-align: center;
-    }
-    
-    .message.error {
-      background-color: #fee;
-      color: #c33;
-      border: 1px solid #fcc;
-    }
-    
-    .message.success {
-      background-color: #efe;
-      color: #3c3;
-      border: 1px solid #cfc;
-    }
-    
-    .message.warning {
-      background-color: #ffc;
-      color: #c93;
-      border: 1px solid #fec;
-    }
-    
-    .spinner {
-      border: 3px solid #f3f3f3;
-      border-top: 3px solid #667eea;
-      border-radius: 50%;
       width: 20px;
       height: 20px;
-      animation: spin 1s linear infinite;
+      border: 3px solid rgba(0, 0, 0, 0.3);
+      border-top-color: var(--darker-bg);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .button-text {
       display: inline-block;
-      margin-left: 10px;
+    }
+
+    .loading .button-text {
       display: none;
     }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+
+    .loading .loading-spinner {
+      display: block;
     }
-    
-    .footer {
+
+    .error-message {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 12px;
+      padding: 14px 18px;
+      color: #fca5a5;
+      font-size: 14px;
       margin-top: 20px;
+      display: none;
+      backdrop-filter: blur(10px);
+      animation: slide-in 0.3s ease;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    .success-message {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 12px;
+      padding: 14px 18px;
+      color: #6ee7b7;
+      font-size: 14px;
+      margin-top: 20px;
+      display: none;
+      backdrop-filter: blur(10px);
+      animation: slide-in 0.3s ease;
+    }
+
+    .success-message.show {
+      display: block;
+    }
+
+    .footer-text {
       text-align: center;
-      color: #666;
-      font-size: 12px;
+      margin-top: 32px;
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+
+    .footer-text strong {
+      background: linear-gradient(135deg, var(--primary-gold), var(--accent-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 600;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .login-card {
+        padding: 36px 28px;
+      }
+
+      .brand-title {
+        font-size: 28px;
+      }
+
+      .logo-icon {
+        width: 70px;
+        height: 70px;
+      }
     }
   </style>
 </head>
 <body>
+  <!-- Background particles -->
+  <div class="bg-particle particle-1"></div>
+  <div class="bg-particle particle-2"></div>
+  <div class="bg-particle particle-3"></div>
+
   <div class="login-container">
-    <div class="logo">
-      <h1>🏢 Nijjara ERP</h1>
-      <p>نظام تخطيط موارد المؤسسة</p>
-    </div>
-    
-    <form id="loginForm">
-      <div class="form-group">
-        <label for="username">اسم المستخدم</label>
-        <input type="text" id="username" name="username" required autocomplete="username">
+    <div class="login-card">
+      <div class="logo-container">
+        <div class="logo-icon"></div>
+        <h1 class="brand-title">Nijjara ERP</h1>
+        <p class="brand-subtitle">ENTERPRISE RESOURCE PLANNING</p>
       </div>
-      
-      <div class="form-group">
-        <label for="password">كلمة المرور</label>
-        <input type="password" id="password" name="password" required autocomplete="current-password">
-      </div>
-      
-      <button type="submit" class="btn" id="loginBtn">
-        <span id="btnText">تسجيل الدخول</span>
-        <span class="spinner" id="spinner"></span>
-      </button>
-      
-      <div class="message" id="message"></div>
-    </form>
-    
-    <div class="footer">
-      <p>&copy; 2025 Nijjara Company. All rights reserved.</p>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label class="form-label" for="username">اسم المستخدم</label>
+          <input 
+            type="text" 
+            id="username" 
+            class="form-input" 
+            placeholder="أدخل اسم المستخدم"
+            required
+            autocomplete="username"
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">كلمة المرور</label>
+          <input 
+            type="password" 
+            id="password" 
+            class="form-input" 
+            placeholder="أدخل كلمة المرور"
+            required
+            autocomplete="current-password"
+          >
+        </div>
+
+        <button type="submit" class="login-button" id="loginButton">
+          <span class="button-text">تسجيل الدخول</span>
+          <div class="loading-spinner"></div>
+        </button>
+
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+      </form>
+
+      <p class="footer-text">
+        Powered by <strong>Nijjara Company</strong> © 2025
+      </p>
     </div>
   </div>
 
   <script>
-    // Include debug.js functions inline for now
-    const DBG = {
-      log: function(level, scope, msg, data) {
-        const timestamp = new Date().toLocaleTimeString();
-        const message = `[CLIENT][${level}] ${timestamp} ${scope} → ${msg}`;
-        console.log(message, data || '');
-      },
-      info: function(scope, msg, data) { this.log('INFO', scope, msg, data); },
-      error: function(scope, msg, data) { this.log('ERR', scope, msg, data); },
-      success: function(scope, msg, data) { this.log('OK', scope, msg, data); },
-      warn: function(scope, msg, data) { this.log('WARN', scope, msg, data); }
-    };
-    
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
+    // Client-side debug logging
+    function DBG(level, message, data) {
+      const timestamp = new Date().toISOString();
+      const logStyle = {
+        INFO: 'color: #06b6d4; font-weight: bold',
+        ERROR: 'color: #ef4444; font-weight: bold',
+        EVENT: 'color: #d4af37; font-weight: bold'
+      };
+      console.log(`%c[CLIENT-${level}] ${timestamp}`, logStyle[level] || '', message, data || '');
+    }
+
+    const loginForm = document.getElementById('loginForm');
+    const loginButton = document.getElementById('loginButton');
+    const errorMessage = document.getElementById('errorMessage');
+    const successMessage = document.getElementById('successMessage');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+
+    DBG('INFO', 'Login page loaded');
+
+    loginForm.addEventListener('submit', async function(e) {
       e.preventDefault();
       
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-      const loginBtn = document.getElementById('loginBtn');
-      const btnText = document.getElementById('btnText');
-      const spinner = document.getElementById('spinner');
-      const message = document.getElementById('message');
-      
-      // Validate inputs
+      const username = usernameInput.value.trim();
+      const password = passwordInput.value;
+
       if (!username || !password) {
-        showMessage('error', 'الرجاء إدخال اسم المستخدم وكلمة المرور');
+        showError('الرجاء إدخال اسم المستخدم وكلمة المرور');
         return;
       }
-      
-      // Disable button and show loading
-      loginBtn.disabled = true;
-      btnText.textContent = 'جاري التحقق...';
-      spinner.style.display = 'inline-block';
-      message.style.display = 'none';
-      
-      DBG.info('Login', 'Attempting login', { username: username });
-      
-      // Call server-side authentication
-      google.script.run
-        .withSuccessHandler(function(response) {
-          DBG.success('Login', 'Server response received', response);
-          
-          if (response.success) {
-            showMessage('success', 'تم تسجيل الدخول بنجاح! جاري التحميل...');
-            DBG.success('Login', 'Authentication successful', response.data);
-            
-            // Store session token
-            sessionStorage.setItem('sessionToken', response.data.sessionToken);
-            sessionStorage.setItem('userId', response.data.userId);
-            sessionStorage.setItem('username', response.data.username);
-            
-            // Redirect to dashboard (will be implemented later)
-            setTimeout(function() {
-              showMessage('success', 'لوحة التحكم قيد التطوير حالياً');
-              resetForm();
-            }, 2000);
-          } else {
-            showMessage('error', response.message || 'فشل تسجيل الدخول');
-            DBG.error('Login', 'Authentication failed', response.errors);
-            resetForm();
-          }
-        })
-        .withFailureHandler(function(error) {
-          DBG.error('Login', 'Server error', error);
-          showMessage('error', 'حدث خطأ في الاتصال بالخادم');
-          resetForm();
-        })
-        .authenticateUser(username, password, 'Web');
+
+      DBG('EVENT', 'Login attempt started', { username });
+
+      // Show loading state
+      loginButton.classList.add('loading');
+      loginButton.disabled = true;
+      hideMessages();
+
+      try {
+        DBG('INFO', 'Calling server authentication...');
+        
+        google.script.run
+          .withSuccessHandler(handleLoginSuccess)
+          .withFailureHandler(handleLoginFailure)
+          .authenticateUser(username, password);
+
+      } catch (error) {
+        DBG('ERROR', 'Client-side error during login', error);
+        handleLoginFailure(error.message || 'حدث خطأ غير متوقع');
+      }
     });
-    
-    function showMessage(type, text) {
-      const message = document.getElementById('message');
-      message.className = 'message ' + type;
-      message.textContent = text;
-      message.style.display = 'block';
-    }
-    
-    function resetForm() {
-      const loginBtn = document.getElementById('loginBtn');
-      const btnText = document.getElementById('btnText');
-      const spinner = document.getElementById('spinner');
+
+    function handleLoginSuccess(response) {
+      DBG('INFO', 'Server response received', response);
       
-      loginBtn.disabled = false;
-      btnText.textContent = 'تسجيل الدخول';
-      spinner.style.display = 'none';
+      loginButton.classList.remove('loading');
+      loginButton.disabled = false;
+
+      if (response && response.success) {
+        DBG('INFO', 'Login successful', response.data);
+        showSuccess('تم تسجيل الدخول بنجاح! جاري التحويل...');
+        
+        setTimeout(() => {
+          // Redirect to main app
+          window.location.href = response.data.redirectUrl || 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec?page=dashboard';
+        }, 1500);
+      } else {
+        DBG('ERROR', 'Login failed', response);
+        showError(response.message || 'اسم المستخدم أو كلمة المرور غير صحيحة');
+      }
     }
+
+    function handleLoginFailure(error) {
+      DBG('ERROR', 'Server call failed', error);
+      
+      loginButton.classList.remove('loading');
+      loginButton.disabled = false;
+      
+      showError('فشل الاتصال بالخادم. الرجاء المحاولة مرة أخرى.');
+    }
+
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.classList.add('show');
+      successMessage.classList.remove('show');
+    }
+
+    function showSuccess(message) {
+      successMessage.textContent = message;
+      successMessage.classList.add('show');
+      errorMessage.classList.remove('show');
+    }
+
+    function hideMessages() {
+      errorMessage.classList.remove('show');
+      successMessage.classList.remove('show');
+    }
+
+    // Enter key support
+    usernameInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        passwordInput.focus();
+      }
+    });
   </script>
 </body>
 </html>
