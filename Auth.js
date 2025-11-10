@@ -26,7 +26,7 @@ function authenticateUser(username, password, ipAddress = 'N/A') {
   try {
     // Validate inputs
     if (isEmpty_(username) || isEmpty_(password)) {
-      throw new Error('Username and password are required');
+      throw new Error('اسم المستخدم وكلمة المرور مطلوبان');
     }
     
     // Check rate limiting
@@ -42,13 +42,13 @@ function authenticateUser(username, password, ipAddress = 'N/A') {
     if (!user) {
       recordFailedAttempt_(username, ipAddress);
       logWarn_('System', 'Login', 'Auth', username, 'User not found');
-      return createResponse_(false, null, 'Invalid username or password', ['INVALID_CREDENTIALS']);
+      return createResponse_(false, null, 'اسم المستخدم أو كلمة المرور غير صحيحة', ['INVALID_CREDENTIALS']);
     }
     
     // Check if user is active
     if (user.USR_Is_Active === false) {
       logWarn_('System', 'Login', 'Auth', username, 'Inactive user attempted login');
-      return createResponse_(false, null, 'Account is inactive', ['ACCOUNT_INACTIVE']);
+      return createResponse_(false, null, 'الحساب غير نشط', ['ACCOUNT_INACTIVE']);
     }
     
     // Verify password
@@ -57,7 +57,7 @@ function authenticateUser(username, password, ipAddress = 'N/A') {
     if (!passwordValid) {
       recordFailedAttempt_(username, ipAddress);
       logError_('System', 'Login', 'Auth', username, 'Invalid password', null);
-      return createResponse_(false, null, 'Invalid username or password', ['INVALID_CREDENTIALS']);
+      return createResponse_(false, null, 'اسم المستخدم أو كلمة المرور غير صحيحة', ['INVALID_CREDENTIALS']);
     }
     
     // Clear failed attempts
@@ -81,11 +81,11 @@ function authenticateUser(username, password, ipAddress = 'N/A') {
       role: user.ROL_ID,
       sessionToken: session.token,
       sessionId: session.id
-    }, 'Authentication successful', []);
+    }, 'تم تسجيل الدخول بنجاح', []);
     
   } catch (error) {
     logError_('System', 'Login', 'Auth', username, 'Authentication error', error);
-    return createResponse_(false, null, 'Authentication failed: ' + error.message, ['AUTH_ERROR']);
+    return createResponse_(false, null, 'فشل المصادقة: ' + error.message, ['AUTH_ERROR']);
   }
 }
 

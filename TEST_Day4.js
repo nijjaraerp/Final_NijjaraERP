@@ -12,6 +12,24 @@ function TEST_createAdminUser() {
   console.log('TEST: Creating Admin User');
   console.log('========================================');
   
+  // First, delete existing user if present
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const usersSheet = ss.getSheetByName('SYS_Users');
+  
+  if (usersSheet) {
+    const data = usersSheet.getDataRange().getValues();
+    const headers = data[0];
+    const usernameCol = headers.indexOf('USR_Name');
+    
+    // Find and delete mkhoraiby user
+    for (let i = data.length - 1; i > 0; i--) {
+      if (data[i][usernameCol] === 'mkhoraiby') {
+        console.log('⚠️ Deleting existing mkhoraiby user at row', i + 1);
+        usersSheet.deleteRow(i + 1);
+      }
+    }
+  }
+  
   const adminData = {
     EMP_Name_EN: 'Mohamed Sherif Elkhoraiby',
     USR_Name: 'mkhoraiby',
@@ -34,6 +52,15 @@ function TEST_createAdminUser() {
     console.log('User ID:', result.data.userId);
     console.log('Username:', adminData.USR_Name);
     console.log('Password:', adminData.Password);
+    
+    // Verify password hash was stored
+    const user = findUserByUsername_('mkhoraiby');
+    console.log('\n🔍 Verification:');
+    console.log('Password_Hash exists:', !!user.Password_Hash);
+    console.log('Password_Salt exists:', !!user.Password_Salt);
+    console.log('Hash length:', user.Password_Hash ? user.Password_Hash.length : 0);
+    console.log('Salt length:', user.Password_Salt ? user.Password_Salt.length : 0);
+    
     console.log('\n👉 You can now test login with these credentials');
   } else {
     console.error('❌ Failed to create admin user');
