@@ -113,10 +113,38 @@
         
         .dock-app {
             width: 70px; height: 70px; border-radius: 12px;
-            background: rgba(255,255,255,0.05); display: flex; flex-direction: column;
+            background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
+            display: flex; flex-direction: column;
             align-items: center; justify-content: center; font-size: 2rem;
             color: var(--color-text-muted); cursor: pointer;
             transition: all 0.3s ease; position: relative; padding: 5px;
+            box-shadow: 
+                0 4px 12px rgba(0,0,0,0.2),
+                inset 0 1px 0 rgba(255,255,255,0.1),
+                inset 0 -1px 0 rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .dock-app::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.12), transparent);
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .dock-app::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+        .dock-app:hover::after {
+            transform: translateX(100%);
         }
         .dock-app-icon { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
         .dock-app-icon svg { width: 100%; height: 100%; stroke: var(--color-text-muted); transition: all 0.3s ease; }
@@ -125,7 +153,19 @@
             font-weight: 400; margin-top: 5px; color: var(--color-text-muted);
             transition: all 0.3s ease;
         }
-        .dock-app:hover { transform: scale(1.1) translateY(-10px); background: var(--color-accent-primary); color: #fff; }
+        .dock-app:hover { 
+            transform: scale(1.15) translateY(-12px); 
+            background: linear-gradient(135deg, rgba(0,120,240,0.9) 0%, rgba(0,160,240,0.9) 100%);
+            color: #fff;
+            box-shadow: 
+                0 8px 32px rgba(0,120,240,0.6),
+                0 0 40px rgba(0,160,240,0.4),
+                inset 0 1px 0 rgba(255,255,255,0.3),
+                inset 0 -1px 0 rgba(0,0,0,0.2);
+        }
+        .dock-app:hover::before {
+            opacity: 1;
+        }
         .dock-app:hover .dock-app-icon svg { stroke: #fff; }
         .dock-app:hover .dock-app-label { color: #fff; }
         
@@ -241,13 +281,41 @@
         }
         
         .fab-main {
-            width: 60px; height: 60px; background: var(--color-accent-primary);
-            border-radius: 50%; display: flex; align-items: center;
-            justify-content: center; cursor: grab;
-            box-shadow: var(--shadow-depth-md); transition: all 0.3s ease;
+            width: 60px; height: 60px; 
+            background: linear-gradient(135deg, rgba(0,120,240,0.9) 0%, rgba(0,160,240,0.9) 100%);
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center;
+            justify-content: center; 
+            cursor: grab;
+            box-shadow: 
+                0 8px 32px rgba(0,0,0,0.4),
+                inset 0 1px 0 rgba(255,255,255,0.2),
+                inset 0 -1px 0 rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .fab-main::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.25), transparent);
+            pointer-events: none;
         }
         .fab-main:active { cursor: grabbing; }
-        .fab-main svg { width: 30px; height: 30px; stroke: #fff; stroke-width: 2; pointer-events: none; }
+        .fab-main:hover {
+            transform: scale(1.1);
+            background: linear-gradient(135deg, rgba(0,160,240,0.95) 0%, rgba(0,200,240,0.95) 100%);
+            box-shadow: 
+                0 12px 40px rgba(0,160,240,0.5),
+                inset 0 1px 0 rgba(255,255,255,0.3),
+                inset 0 -1px 0 rgba(0,0,0,0.2);
+        }
+        .fab-main svg { width: 30px; height: 30px; stroke: #fff; stroke-width: 2; pointer-events: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
         .fab-main:hover { transform: scale(1.1); background: var(--color-accent-secondary); }
         
         .fab-rays {
@@ -259,13 +327,40 @@
         .fab-ray { position: absolute; top: 50%; left: 50%; width: 100px; transform-origin: 0 50%; height: 1px; }
         .fab-sub-app {
             position: absolute; right: -20px; top: -20px;
-            width: 40px; height: 40px; background: #fff;
-            border-radius: 50%; display: flex; align-items: center;
-            justify-content: center; cursor: pointer; box-shadow: var(--shadow-depth-md);
+            width: 40px; height: 40px; 
+            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center;
+            justify-content: center; 
+            cursor: pointer; 
+            box-shadow: 
+                0 4px 16px rgba(0,0,0,0.3),
+                inset 0 1px 0 rgba(255,255,255,0.8),
+                inset 0 -1px 0 rgba(0,0,0,0.1);
             transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
         }
-        .fab-sub-app svg { width: 20px; height: 20px; stroke: var(--color-accent-primary); stroke-width: 2; }
-        .fab-sub-app:hover { background: var(--color-text-muted); }
+        .fab-sub-app::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.6), transparent);
+            pointer-events: none;
+        }
+        .fab-sub-app svg { width: 20px; height: 20px; stroke: var(--color-accent-primary); stroke-width: 2; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2)); }
+        .fab-sub-app:hover { 
+            background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+            transform: scale(1.1);
+            box-shadow: 
+                0 6px 20px rgba(0,0,0,0.4),
+                inset 0 1px 0 rgba(255,255,255,0.8),
+                inset 0 -1px 0 rgba(0,0,0,0.15);
+        }
         
         .fab-ray:nth-child(1) { transform: translate(30px, 30px) rotate(-45deg); }
         .fab-ray:nth-child(2) { transform: translate(30px, 30px) rotate(0deg); }
@@ -330,7 +425,120 @@
             color: var(--color-text-muted); white-space: nowrap;
         }
         
-        /* --- 2.8 (جديد) شريط إجراءات النوافذ الجانبي --- */
+        /* --- 2.8 Toast Notifications --- */
+        #toast-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 300px;
+            max-width: 400px;
+        }
+        .toast {
+            background: var(--color-bg-glass);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--color-border-glass);
+            border-radius: 12px;
+            padding: 15px 20px;
+            box-shadow: var(--shadow-depth-lg);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideInRight 0.5s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+        .toast::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--toast-color, var(--color-accent-primary));
+        }
+        .toast.success { --toast-color: var(--color-accent-green); }
+        .toast.error { --toast-color: var(--color-accent-red); }
+        .toast.warning { --toast-color: #f0a000; }
+        .toast.info { --toast-color: var(--color-accent-primary); }
+        .toast-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--toast-color, var(--color-accent-primary));
+            flex-shrink: 0;
+        }
+        .toast-icon svg {
+            width: 16px;
+            height: 16px;
+            stroke: #fff;
+            stroke-width: 2;
+        }
+        .toast-content {
+            flex: 1;
+            font-family: var(--font-family);
+        }
+        .toast-title {
+            font-weight: 700;
+            color: var(--color-text);
+            margin-bottom: 4px;
+        }
+        .toast-message {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+        }
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+        .toast-close:hover {
+            color: var(--color-text);
+        }
+        .toast-close svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            stroke-width: 2;
+        }
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        .toast.hiding {
+            animation: slideOutRight 0.3s ease-out forwards;
+        }
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        /* --- 2.9 (جديد) شريط إجراءات النوافذ الجانبي --- */
         #window-action-bar {
             position: fixed;
             left: -55px; /* إخفاء تلقائي - RTL friendly */
@@ -397,6 +605,10 @@
             <symbol id="icon-plus" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></symbol>
             <symbol id="icon-search" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></symbol>
             <symbol id="icon-minus" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></symbol>
+            <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></symbol>
+            <symbol id="icon-x" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></symbol>
+            <symbol id="icon-alert" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></symbol>
+            <symbol id="icon-info" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></symbol>
         </defs>
     </svg>
 
@@ -413,6 +625,9 @@
     </div>
 
     <div id="nijjara-os">
+        
+        <!-- Toast Notification Container -->
+        <div id="toast-container"></div>
         
         <div id="holo-deck">
             <div id="particles"></div>
@@ -538,6 +753,54 @@
         
         document.addEventListener('DOMContentLoaded', () => {
 
+            // --- Toast Notification System ---
+            function showToast(title, message, type = 'info', duration = 4000) {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                
+                const iconMap = {
+                    'success': 'icon-check',
+                    'error': 'icon-x',
+                    'warning': 'icon-alert',
+                    'info': 'icon-info'
+                };
+                
+                toast.innerHTML = `
+                    <div class="toast-icon">
+                        <svg><use href="#${iconMap[type] || 'icon-info'}"></use></svg>
+                    </div>
+                    <div class="toast-content">
+                        <div class="toast-title">${title}</div>
+                        <div class="toast-message">${message}</div>
+                    </div>
+                    <button class="toast-close">
+                        <svg><use href="#icon-x"></use></svg>
+                    </button>
+                `;
+                
+                container.appendChild(toast);
+                
+                // Close button handler
+                const closeBtn = toast.querySelector('.toast-close');
+                closeBtn.addEventListener('click', () => {
+                    toast.classList.add('hiding');
+                    setTimeout(() => toast.remove(), 300);
+                });
+                
+                // Auto-dismiss
+                if (duration > 0) {
+                    setTimeout(() => {
+                        if (toast.parentElement) {
+                            toast.classList.add('hiding');
+                            setTimeout(() => toast.remove(), 300);
+                        }
+                    }, duration);
+                }
+                
+                return toast;
+            }
+
             // --- 1. Element Selectors ---
             const bootScreen = document.getElementById('boot-screen');
             const bootLog = document.getElementById('boot-log');
@@ -607,13 +870,23 @@
                             // Store session data
                             sessionStorage.setItem('nijjara_session', JSON.stringify(response.data));
                             
-                            // Boot into OS
-                            bootScreen.style.opacity = '0';
-                            bootScreen.style.visibility = 'hidden';
-                            nijjaraOS.style.display = 'block';
+                            // Show success toast
+                            showToast(
+                                'تم تسجيل الدخول بنجاح',
+                                `مرحباً ${response.data.username}، تم تفعيل النظام`,
+                                'success',
+                                3000
+                            );
                             
-                            document.getElementById('user-info').textContent = `USER: ${response.data.username}`;
-                            startClock();
+                            // Boot into OS with slight delay for toast visibility
+                            setTimeout(() => {
+                                bootScreen.style.opacity = '0';
+                                bootScreen.style.visibility = 'hidden';
+                                nijjaraOS.style.display = 'block';
+                                
+                                document.getElementById('user-info').textContent = `USER: ${response.data.username}`;
+                                startClock();
+                            }, 500);
                         } else {
                             logToConsole('Login failed: ' + response.message, 'CLIENT-ERROR');
                             document.getElementById('login-feedback').textContent = response.message || 'فشل تسجيل الدخول';
