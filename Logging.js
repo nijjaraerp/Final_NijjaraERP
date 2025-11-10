@@ -76,7 +76,9 @@ function shouldAudit_(action) {
   const auditableActions = [
     'Create', 'Update', 'Delete', 'Login', 'Logout', 
     'Approve', 'Reject', 'Lock', 'Unlock', 'Assign',
-    'Revoke', 'Grant', 'Deactivate', 'Activate'
+    'Revoke', 'Grant', 'Deactivate', 'Activate',
+    'SeedStart', 'SeedComplete', 'SeedFailed', 'MasterSeedStart', 'MasterSeedComplete',
+    'setupAllSheets', 'openAuditLog', 'showSystemInfo'
   ];
   return auditableActions.includes(action);
 }
