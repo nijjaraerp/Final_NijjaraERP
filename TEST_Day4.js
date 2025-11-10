@@ -13,14 +13,14 @@ function TEST_createAdminUser() {
   console.log('========================================');
   
   const adminData = {
-    User_Name: 'admin',
-    User_Full_Name: 'System Administrator',
-    User_Email: 'admin@nijjara.local',
-    User_Mobile: '+966500000000',
-    User_Role: 'ROL-ADMIN',
-    User_Department: 'IT',
-    User_Password: 'Admin@123',  // Meets strength requirements
-    User_IsActive: true
+    EMP_Name_EN: 'System Administrator',
+    USR_Name: 'admin',
+    EMP_Email: 'admin@nijjara.local',
+    Job_Title: 'System Administrator',
+    DEPT_Name: 'IT',
+    ROL_ID: 'ROL-ADMIN',
+    Password: 'Admin@123',  // Meets strength requirements
+    USR_Is_Active: true
   };
   
   console.log('Creating user with data:', adminData);
@@ -32,8 +32,8 @@ function TEST_createAdminUser() {
   if (result.success) {
     console.log('✅ Admin user created successfully');
     console.log('User ID:', result.data.userId);
-    console.log('Username:', adminData.User_Name);
-    console.log('Password:', adminData.User_Password);
+    console.log('Username:', adminData.USR_Name);
+    console.log('Password:', adminData.Password);
     console.log('\n👉 You can now test login with these credentials');
   } else {
     console.error('❌ Failed to create admin user');
