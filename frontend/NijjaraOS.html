@@ -19,7 +19,8 @@
     <script>
       // Debug flag injected from Apps Script template (set in Code.js doGet)
       // Will be an empty string when not provided.
-      window.__DEBUG__ = <?!= JSON.stringify(typeof debug !== 'undefined' ? debug : '') ?>;
+      // Injected via Apps Script template. IMPORTANT: no wrapping quotes so the JSON string is parsed directly.
+      window.__DEBUG__ = '<?!= JSON.stringify(typeof debug !== "undefined" ? debug : "") ?>';
     </script>
 
     <style>
