@@ -2310,6 +2310,28 @@
         compactOrb.addEventListener("click", () => {
           fiveEngineHub.classList.remove("compact");
           compactOrb.classList.remove("visible");
+          // Telemetry: hub expanded by compact orb
+          try {
+            const activeModule =
+              document
+                .querySelector("#five-engine-hub .orbit-module.active")
+                ?.getAttribute("data-module") || null;
+            window.parent?.postMessage(
+              {
+                type: "nijjara-status",
+                source: "compactOrbExpand",
+                module: activeModule,
+                hubCompact: false,
+                drawerOpen:
+                  moduleDrawer?.classList?.contains("visible") || false,
+                overlayVisible:
+                  moduleDrawerOverlay?.classList?.contains("visible") || false,
+                bodyDrawerOpen: document.body.classList.contains("drawer-open"),
+                timestamp: Date.now(),
+              },
+              "*"
+            );
+          } catch {}
         });
 
         // Central Search Functionality
@@ -2466,6 +2488,37 @@
         }
 
         function openModuleDrawer(moduleId) {
+          // Report current state to parent (for deployment validation telemetry)
+          // This emits lightweight status messages consumable by the top-level page via postMessage
+          function reportState(source, mod) {
+            try {
+              const hubCompact =
+                fiveEngineHub?.classList?.contains("compact") || false;
+              const drawerOpen =
+                moduleDrawer?.classList?.contains("visible") || false;
+              const overlayVisible =
+                moduleDrawerOverlay?.classList?.contains("visible") || false;
+              const bodyDrawerOpen =
+                document.body.classList.contains("drawer-open");
+              const activeModule =
+                document
+                  .querySelector("#five-engine-hub .orbit-module.active")
+                  ?.getAttribute("data-module") || null;
+              const payload = {
+                type: "nijjara-status",
+                source,
+                module: mod || activeModule,
+                hubCompact,
+                drawerOpen,
+                overlayVisible,
+                bodyDrawerOpen,
+                timestamp: Date.now(),
+              };
+              window.parent?.postMessage(payload, "*");
+            } catch (e) {
+              console.warn("reportState error", e);
+            }
+          }
           // Mark selected module active
           document
             .querySelectorAll("#five-engine-hub .orbit-module")
@@ -2484,6 +2537,8 @@
           document.body.classList.add("drawer-open");
           moduleDrawerOverlay.classList.add("visible");
           moduleDrawer.classList.add("visible");
+          // Telemetry: drawer opened + hub compacted
+          reportState("openModuleDrawer", moduleId);
 
           // Populate submodules in circular pattern
           const subs = getSubmodules(moduleId);
@@ -2521,6 +2576,31 @@
           document
             .querySelectorAll("#five-engine-hub .orbit-module")
             .forEach((el) => el.classList.remove("active"));
+          // Telemetry: drawer closed (hub remains compact until user expands)
+          try {
+            const activeModule =
+              document
+                .querySelector("#five-engine-hub .orbit-module.active")
+                ?.getAttribute("data-module") || null;
+            window.parent?.postMessage(
+              {
+                type: "nijjara-status",
+                source: "closeModuleDrawer",
+                module: activeModule,
+                hubCompact:
+                  fiveEngineHub?.classList?.contains("compact") || false,
+                drawerOpen:
+                  moduleDrawer?.classList?.contains("visible") || false,
+                overlayVisible:
+                  moduleDrawerOverlay?.classList?.contains("visible") || false,
+                bodyDrawerOpen: document.body.classList.contains("drawer-open"),
+                timestamp: Date.now(),
+              },
+              "*"
+            );
+          } catch (e) {
+            console.warn("reportState error", e);
+          }
         }
 
         moduleDrawerOverlay.addEventListener("click", closeModuleDrawer);
@@ -2531,6 +2611,17 @@
 
         // Ensure compact orb also closes the drawer if open
         compactOrb.addEventListener("click", () => {
+          // Telemetry: user clicked compact orb while drawer may be open
+          try {
+            window.parent?.postMessage(
+              {
+                type: "nijjara-status",
+                source: "compactOrbClick",
+                timestamp: Date.now(),
+              },
+              "*"
+            );
+          } catch {}
           if (document.body.classList.contains("drawer-open")) {
             closeModuleDrawer();
           }
