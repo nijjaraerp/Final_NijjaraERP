@@ -16,6 +16,12 @@
       rel="stylesheet"
     />
 
+    <script>
+      // Debug flag injected from Apps Script template (set in Code.js doGet)
+      // Will be an empty string when not provided.
+      window.__DEBUG__ = <?!= JSON.stringify(typeof debug !== 'undefined' ? debug : '') ?>;
+    </script>
+
     <style>
       /* --- II. CSS STYLES --- */
 
@@ -3225,6 +3231,31 @@
         // --- 10. Global Log Function ---
         function logToConsole(message, type = "CLIENT-INFO") {
           console.log(`[${type}] ${message}`);
+        }
+      });
+
+      // Temporary auto-validation helper: if URL has ?debug=1 (passed via Apps Script template),
+      // expand the hub and open the HRM module drawer automatically after load.
+      window.addEventListener("load", () => {
+        try {
+          if (String(window.__DEBUG__) === "1") {
+            // Expand hub (simulate compact orb) then open HRM drawer
+            fiveEngineHub.classList.remove("compact");
+            compactOrb.classList.remove("visible");
+            window.parent?.postMessage(
+              {
+                type: "nijjara-status",
+                source: "debug:autoExpandHub",
+                timestamp: Date.now(),
+              },
+              "*"
+            );
+            setTimeout(() => {
+              openModuleDrawer("hrm");
+            }, 300);
+          }
+        } catch (err) {
+          console.warn("Debug auto-open failed:", err);
         }
       });
     </script>

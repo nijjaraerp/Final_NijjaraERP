@@ -187,6 +187,11 @@ function doGet(e) {
     
     // Always serve the Nijjara-OS interface (it handles its own login/desktop)
     const template = HtmlService.createTemplateFromFile('frontend/NijjaraOS');
+    // Pass through simple query params for debug/validation automation
+    // Example: https://.../exec?debug=1
+    template.debug = (e && e.parameter && typeof e.parameter.debug !== 'undefined')
+      ? String(e.parameter.debug)
+      : '';
     const html = template.evaluate()
       .setTitle('Nijjara-OS | Enterprise Resource Planning')
       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
