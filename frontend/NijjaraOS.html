@@ -96,26 +96,26 @@
     </aside>
 
     <script>
-      const fiveEngineHub = document.getElementById('fiveEngineHub');
-      const compactOrb = document.getElementById('compactOrb');
-      const moduleDrawer = document.getElementById('moduleDrawer');
+      const fiveEngineHub = document.getElementById("fiveEngineHub");
+      const compactOrb = document.getElementById("compactOrb");
+      const moduleDrawer = document.getElementById("moduleDrawer");
 
       function openModuleDrawer(module) {
-        moduleDrawer.classList.add('open');
-        moduleDrawer.setAttribute('aria-hidden', 'false');
-        console.log('Drawer opened for module:', module);
+        moduleDrawer.classList.add("open");
+        moduleDrawer.setAttribute("aria-hidden", "false");
+        console.log("Drawer opened for module:", module);
       }
 
-      window.addEventListener('load', () => {
+      window.addEventListener("load", () => {
         // Safely get debug value from data attribute for local preview compatibility
-        window.__DEBUG__ = document.body.dataset.debug || '0'; // Default to '0' if not set
+        window.__DEBUG__ = document.body.dataset.debug || "0"; // Default to '0' if not set
 
-        if (String(window.__DEBUG__) === '1') {
+        if (String(window.__DEBUG__) === "1") {
           // Expand hub and hide orb
-          fiveEngineHub.classList.remove('compact');
-          compactOrb.classList.remove('visible');
+          fiveEngineHub.classList.remove("compact");
+          compactOrb.classList.remove("visible");
           // Open HRM drawer
-          setTimeout(() => openModuleDrawer('hrm'), 300);
+          setTimeout(() => openModuleDrawer("hrm"), 300);
         }
       });
     </script>
