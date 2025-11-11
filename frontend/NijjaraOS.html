@@ -96,26 +96,34 @@
     </aside>
 
     <script>
-      const fiveEngineHub = document.getElementById("fiveEngineHub");
-      const compactOrb = document.getElementById("compactOrb");
-      const moduleDrawer = document.getElementById("moduleDrawer");
+      const fiveEngineHub = document.getElementById('fiveEngineHub');
+      const compactOrb = document.getElementById('compactOrb');
+      const moduleDrawer = document.getElementById('moduleDrawer');
 
       function openModuleDrawer(module) {
-        moduleDrawer.classList.add("open");
-        moduleDrawer.setAttribute("aria-hidden", "false");
-        console.log("Drawer opened for module:", module);
+        moduleDrawer.classList.add('open');
+        moduleDrawer.setAttribute('aria-hidden', 'false');
+        console.log('Drawer opened for module:', module);
       }
 
-      window.addEventListener("load", () => {
-        // Safely get debug value from data attribute for local preview compatibility
-        window.__DEBUG__ = document.body.dataset.debug || "0"; // Default to '0' if not set
+      function isDebugEnabled() {
+        const data = (document.body.dataset.debug || '').trim().toLowerCase();
+        if (data === '1' || data === 'true') return true;
+        const params = new URLSearchParams(window.location.search);
+        const p = (params.get('debug') || '').trim().toLowerCase();
+        return p === '1' || p === 'true';
+      }
 
-        if (String(window.__DEBUG__) === "1") {
+      window.addEventListener('load', () => {
+        // Determine debug mode from data attribute or URL param for local preview compatibility
+        window.__DEBUG__ = isDebugEnabled() ? '1' : '0';
+
+        if (window.__DEBUG__ === '1') {
           // Expand hub and hide orb
-          fiveEngineHub.classList.remove("compact");
-          compactOrb.classList.remove("visible");
+          fiveEngineHub.classList.remove('compact');
+          compactOrb.classList.remove('visible');
           // Open HRM drawer
-          setTimeout(() => openModuleDrawer("hrm"), 300);
+          setTimeout(() => openModuleDrawer('hrm'), 300);
         }
       });
     </script>
