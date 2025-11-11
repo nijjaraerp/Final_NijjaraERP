@@ -2609,6 +2609,35 @@
           if (e.key === "Escape") closeModuleDrawer();
         });
 
+        // Parent-controlled actions (for deployment validation in sandboxed iframe)
+        // Allows the top-level page to trigger module drawer interactions via postMessage
+        window.addEventListener("message", (e) => {
+          const data = e?.data;
+          if (!data || data.type !== "nijjara-action") return;
+          try {
+            if (data.action === "openModule" && data.module) {
+              openModuleDrawer(String(data.module));
+            } else if (data.action === "closeDrawer") {
+              closeModuleDrawer();
+            } else if (data.action === "compactOrbExpand") {
+              // Expand hub (mirror of compact orb manual click)
+              fiveEngineHub.classList.remove("compact");
+              compactOrb.classList.remove("visible");
+              // Telemetry
+              window.parent?.postMessage(
+                {
+                  type: "nijjara-status",
+                  source: "compactOrbExpand(remote)",
+                  timestamp: Date.now(),
+                },
+                "*"
+              );
+            }
+          } catch (err) {
+            console.warn("Parent nijjara-action handler error:", err);
+          }
+        });
+
         // Ensure compact orb also closes the drawer if open
         compactOrb.addEventListener("click", () => {
           // Telemetry: user clicked compact orb while drawer may be open
