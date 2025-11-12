@@ -5,7 +5,8 @@
     "main": "Code.js",
     "scripts": {
         "pull": "clasp pull",
-        "push": "clasp push --force",
+        "verify:appscript-paths": "node scripts/check-appscript-paths.js",
+        "push": "npm run verify:appscript-paths && clasp push --force",
         "push:git": "git push origin main",
         "push:both": "npm run push && npm run push:git",
         "deploy": "npm run push:both",
@@ -13,7 +14,8 @@
         "status": "git status && echo '\n--- Clasp Status ---' && clasp status || echo 'Clasp not logged in or configured'",
         "setup": "echo 'Setting up Nijjara ERP...' && npm install && echo '\nNext steps:' && echo '1. Run: clasp login (to authenticate with Google)' && echo '2. Run: clasp create --type standalone --title \"Nijjara ERP\" (if new project)' && echo '3. Run: clasp push (to push code to Apps Script)' && echo '4. Configure Git: git config credential.helper store' && echo '5. Run: npm run deploy (to sync everything)'",
         "deploy:web:new": "npx clasp version && npx clasp deploy -d \"Create new Web App deployment\" && npx clasp deployments",
-        "deploy:web:redeploy": "node scripts/redeploy.js"
+        "deploy:web:redeploy": "node scripts/redeploy.js",
+        "prepare": "husky install"
     },
     "keywords": [
         "apps-script",
@@ -23,6 +25,7 @@
     "author": "Nijjara ERP",
     "license": "ISC",
     "devDependencies": {
-        "@google/clasp": "^3.1.1"
+        "@google/clasp": "^3.1.1",
+        "husky": "^9.1.0"
     }
 }
