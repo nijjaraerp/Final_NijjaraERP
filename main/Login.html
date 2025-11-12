@@ -1,163 +1,132 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nijjara ERP Login</title>
+  <title>Neon Cyber Login</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #060920 0%, #0a0e27 50%, #0f1729 100%);
+      font-family: 'Courier New', 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+      background: #0a0a0a;
       min-height: 100vh;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
+      padding: 20px;
+      line-height: 1.4;
       position: relative;
       overflow: hidden;
     }
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-20px); }
-    }
-    .particle {
-      position: absolute;
-      border-radius: 50%;
-      opacity: 0.08;
-      animation: float 15s infinite ease-in-out;
-    }
-    .p1 { width: 300px; height: 300px; background: radial-gradient(circle, #d4af37, transparent); top: -150px; right: -150px; }
-    .p2 { width: 400px; height: 400px; background: radial-gradient(circle, #06b6d4, transparent); bottom: -200px; left: -200px; animation-delay: 5s; }
-    .p3 { width: 250px; height: 250px; background: radial-gradient(circle, #7c3aed, transparent); top: 50%; left: 50%; transform: translate(-50%, -50%); animation-delay: 10s; }
-    .login-card {
-      background: rgba(15, 23, 42, 0.7);
-      backdrop-filter: blur(20px);
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 32px 28px;
-      width: 90%;
-      max-width: 380px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-      position: relative;
-      z-index: 10;
-    }
-    .logo {
-      width: 64px;
-      height: 64px;
-      margin: 0 auto 12px;
-      background: linear-gradient(135deg, #d4af37, #06b6d4);
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-      box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3);
-    }
-    .logo::after { content: '⚡'; color: #060920; }
-    h1 {
-      text-align: center;
-      font-size: 26px;
-      background: linear-gradient(135deg, #d4af37, #06b6d4, #7c3aed);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 6px;
-    }
-    .subtitle {
-      text-align: center;
-      color: #94a3b8;
-      font-size: 11px;
-      letter-spacing: 1.5px;
-      margin-bottom: 24px;
-    }
-    .form-group {
-      margin-bottom: 18px;
-    }
-    label {
-      display: block;
-      color: #94a3b8;
-      font-size: 12px;
-      margin-bottom: 6px;
-      text-transform: uppercase;
-    }
-    input {
-      width: 100%;
-      padding: 12px 16px;
-      background: rgba(15, 23, 42, 0.6);
-      border: 1.5px solid rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      color: #f1f5f9;
-      font-size: 14px;
-      transition: all 0.3s;
-    }
-    input:focus {
-      outline: none;
-      border-color: #d4af37;
-      box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
-      transform: translateY(-2px);
-    }
-    button {
-      width: 100%;
-      padding: 13px;
-      background: linear-gradient(135deg, #d4af37, #c49a2a);
-      border: none;
-      border-radius: 10px;
-      color: #060920;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s;
-      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
-    }
-    button:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 30px rgba(212, 175, 55, 0.6);
-    }
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
-    .message {
-      margin-top: 16px;
-      padding: 12px 14px;
-      border-radius: 10px;
-      font-size: 13px;
-      display: none;
-      text-align: center;
-    }
-    .error {
-      background: rgba(239, 68, 68, 0.15);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      color: #fca5a5;
-    }
-    .success {
-      background: rgba(16, 185, 129, 0.15);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      color: #6ee7b7;
-    }
-    .show { display: block !important; }
-    .footer {
-      text-align: center;
-      margin-top: 24px;
-      color: #64748b;
-      font-size: 11px;
-    }
+    .cyber-grid { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+    .grid-line { position: absolute; background: linear-gradient(90deg, transparent, #00ff41, transparent); opacity: 0.1; animation: gridPulse 4s ease-in-out infinite; }
+    .grid-h-1 { top: 20%; left: 0; width: 100%; height: 1px; animation-delay: 0s; }
+    .grid-h-2 { top: 50%; left: 0; width: 100%; height: 1px; animation-delay: 1.5s; }
+    .grid-h-3 { top: 80%; left: 0; width: 100%; height: 1px; animation-delay: 3s; }
+    .grid-v-1 { top: 0; left: 25%; width: 1px; height: 100%; background: linear-gradient(0deg, transparent, #00ff41, transparent); animation-delay: .75s; }
+    .grid-v-2 { top: 0; left: 75%; width: 1px; height: 100%; background: linear-gradient(0deg, transparent, #00ff41, transparent); animation-delay: 2.25s; }
+    @keyframes gridPulse { 0%,100%{opacity:.1} 50%{opacity:.3} }
+    .cyber-glitch { position:absolute; width:200px; height:2px; background:#ff0080; opacity:0; animation:glitchFlash 6s ease-in-out infinite; }
+    .glitch-1 { top:30%; left:10%; animation-delay:2s; }
+    .glitch-2 { top:70%; right:10%; animation-delay:4s; }
+    @keyframes glitchFlash { 0%,95%,100%{opacity:0; transform:scaleX(0);} 96%,99%{opacity:.8; transform:scaleX(1);} }
+
+    .login-container { width: 100%; max-width: 460px; position: relative; z-index: 1; }
+    .cyber-terminal { background: rgba(0,0,0,.9); border: 2px solid #00ff41; border-radius: 8px; overflow: hidden; box-shadow: 0 0 30px rgba(0,255,65,.3), inset 0 0 0 1px rgba(0,255,65,.1); position: relative; }
+    .terminal-header { background: linear-gradient(90deg,#1a1a1a,#2a2a2a); padding: 12px 16px; border-bottom: 1px solid #00ff41; display:flex; align-items:center; justify-content:space-between; }
+    .terminal-buttons{display:flex; gap:8px;} .term-btn{width:12px; height:12px; border-radius:50%;} .btn-red{background:#ff5555; box-shadow:0 0 8px rgba(255,85,85,.5);} .btn-yellow{background:#ffff55; box-shadow:0 0 8px rgba(255,255,85,.5);} .btn-green{background:#55ff55; box-shadow:0 0 8px rgba(85,255,85,.5);} .terminal-title{color:#00ff41; font-size:12px; font-weight:bold; text-transform:uppercase; letter-spacing:1px;}
+    .cyber-content{padding:40px 32px;}
+    .neon-header{ text-align:center; margin-bottom:36px; }
+    .cyber-title{ color:#00ff41; font-size:1.75rem; font-weight:bold; margin-bottom:8px; text-transform:uppercase; letter-spacing:2px; position:relative; }
+    .access-text{ color:#00ff41; opacity:.7; font-size:12px; letter-spacing:1px; }
+
+    .neon-form .cyber-field{ margin-bottom:18px; }
+    .field-frame{ position:relative; }
+    .field-border{ position:absolute; inset:0; border:1px solid #00ff41; border-radius:6px; opacity:.4; }
+    .neon-form input{ width:100%; background:#0f0f0f; color:#e6ffe6; border:none; padding:14px 16px; border-radius:6px; outline:none; }
+    .neon-form label{ position:absolute; left:12px; top:-10px; background:#0a0a0a; color:#00ff41; font-size:11px; padding:0 6px; letter-spacing:1px; }
+    .cyber-scanner{ position:absolute; inset:0; overflow:hidden; pointer-events:none; }
+    .cyber-scanner .scan-line{ position:absolute; left:-100%; top:0; width:100%; height:100%; background: linear-gradient(90deg, transparent, rgba(0,255,65,.5), transparent); animation:scanLine 2s linear infinite; }
+    @keyframes scanLine { 0%{left:-100%} 100%{left:100%} }
+
+    .cyber-options{ display:flex; align-items:center; justify-content:space-between; margin:10px 0 16px; }
+    .neon-checkbox{ display:flex; align-items:center; gap:10px; color:#00ff41; font-size:12px; }
+    .submit-frame{ position:relative; }
+    #loginBtn{ width:100%; padding:12px 16px; border:2px solid #00ff41; background:#0c0c0c; color:#00ff41; font-weight:bold; text-transform:uppercase; letter-spacing:1px; border-radius:6px; cursor:pointer; }
+    #loginBtn:hover{ box-shadow:0 0 14px rgba(0,255,65,.3); }
+    #loginBtn:disabled{ opacity:.6; cursor:not-allowed; }
+
+    .message{ margin-top:12px; padding:10px 12px; border-radius:6px; font-size:12px; display:none; text-align:center; }
+    .error{ background: rgba(255,0,0,.1); border:1px solid rgba(255,0,0,.3); color:#ff9f9f; }
+    .success{ background: rgba(0,255,65,.1); border:1px solid rgba(0,255,65,.3); color:#a6ffb0; }
+    .show{ display:block !important; }
+    .footer{ text-align:center; margin-top:16px; color:#7b7b7b; font-size:11px; }
   </style>
 </head>
 <body>
-  <div class="particle p1"></div>
-  <div class="particle p2"></div>
-  <div class="particle p3"></div>
-  <div class="login-card">
-    <div class="logo"></div>
-    <h1>Nijjara ERP</h1>
-    <p class="subtitle">ENTERPRISE RESOURCE PLANNING</p>
-    <form id="loginForm">
-      <div class="form-group">
-        <label>اسم المستخدم</label>
-        <input type="text" id="username" placeholder="أدخل اسم المستخدم" required>
+  <div class="cyber-grid">
+    <div class="grid-line grid-h-1"></div>
+    <div class="grid-line grid-v-1"></div>
+    <div class="grid-line grid-h-2"></div>
+    <div class="grid-line grid-v-2"></div>
+    <div class="grid-line grid-h-3"></div>
+    <div class="cyber-glitch glitch-1"></div>
+    <div class="cyber-glitch glitch-2"></div>
+  </div>
+
+  <div class="login-container">
+    <div class="cyber-terminal">
+      <div class="terminal-header">
+        <div class="terminal-buttons">
+          <div class="term-btn btn-red"></div>
+          <div class="term-btn btn-yellow"></div>
+          <div class="term-btn btn-green"></div>
+        </div>
+        <div class="terminal-title">NEURAL_INTERFACE.exe</div>
       </div>
+      <div class="cyber-content">
+        <div class="neon-header">
+          <h1 class="cyber-title"><span class="title-glitch" data-text="CYPHER_NET">CYPHER_NET</span></h1>
+          <p class="access-text">[ SECURE_TERMINAL_ACCESS ]</p>
+        </div>
+
+        <form class="neon-form" id="loginForm" novalidate>
+          <div class="cyber-field">
+            <div class="field-frame">
+              <div class="field-border"></div>
+              <input type="text" id="username" name="username" required autocomplete="username" placeholder="">
+              <label for="username">&gt; USER_HANDLE</label>
+              <div class="cyber-scanner"><div class="scan-line"></div></div>
+            </div>
+          </div>
+
+          <div class="cyber-field">
+            <div class="field-frame">
+              <div class="field-border"></div>
+              <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="">
+              <label for="password">&gt; ACCESS_CODE</label>
+              <div class="cyber-scanner"><div class="scan-line"></div></div>
+            </div>
+          </div>
+
+          <div class="cyber-options">
+            <label class="neon-checkbox">
+              <input type="checkbox" id="remember" name="remember">
+              <span>[ REMEMBER_SESSION ]</span>
+            </label>
+            <a href="#" style="color:#ff0080; font-size:12px; text-decoration:none;">[ ALT_PROTOCOLS ]</a>
+          </div>
+
+          <div class="submit-frame">
+            <button type="submit" id="loginBtn">[ CONNECT ]</button>
+          </div>
+          <div class="message error" id="errorMsg"></div>
+          <div class="message success" id="successMsg"></div>
+        </form>
+      </div>
+    </div>
+    <p class="footer">[ CONNECTION_ESTABLISHED ] Accessing neural interface...</p>
+  </div>
       <div class="form-group">
         <label>كلمة المرور</label>
         <input type="password" id="password" placeholder="أدخل كلمة المرور" required>
@@ -178,11 +147,11 @@
       const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value;
       if (!username || !password) {
-        showError('الرجاء إدخال اسم المستخدم وكلمة المرور');
+        showError('Missing USER_HANDLE or ACCESS_CODE');
         return;
       }
       btn.disabled = true;
-      btn.textContent = 'جاري التحميل...';
+      btn.textContent = '[ CONNECTING ]';
       hideMessages();
       google.script.run
         .withSuccessHandler(handleSuccess)
@@ -191,23 +160,21 @@
     });
     function handleSuccess(response) {
       btn.disabled = false;
-      btn.textContent = 'تسجيل الدخول';
+      btn.textContent = '[ CONNECT ]';
       if (response && response.success) {
-        showSuccess('تم تسجيل الدخول بنجاح!');
+        showSuccess('[ ACCESS GRANTED ]');
         setTimeout(function() {
-          // Store session in browser
           sessionStorage.setItem('erp_session', JSON.stringify(response.data));
-          // Reload to dashboard
           window.location.href = window.location.origin + window.location.pathname + '?page=dashboard';
-        }, 1500);
+        }, 1000);
       } else {
-        showError(response.message || 'اسم المستخدم أو كلمة المرور غير صحيحة');
+        showError(response && response.message ? response.message : '[ ACCESS DENIED ] Invalid credentials');
       }
     }
     function handleFailure(error) {
       btn.disabled = false;
-      btn.textContent = 'تسجيل الدخول';
-      showError('فشل الاتصال بالخادم');
+      btn.textContent = '[ CONNECT ]';
+      showError('[ LINK FAILURE ] Could not reach server');
     }
     function showError(msg) {
       errorMsg.textContent = msg;
