@@ -300,7 +300,8 @@ function doGet(e) {
     );
 
     if (shouldShowDashboard) {
-      const osTpl = HtmlService.createTemplateFromFile("frontend/NijjaraOS");
+      // Serve dashboard from main folder templates
+      const osTpl = HtmlService.createTemplateFromFile("NijjaraOS");
       osTpl.debug = debug;
       const osHtml = osTpl
         .evaluate()
@@ -311,7 +312,7 @@ function doGet(e) {
     }
 
     // Default: show Login
-    const loginTpl = HtmlService.createTemplateFromFile("frontend/Login");
+    const loginTpl = HtmlService.createTemplateFromFile("Login");
     const loginHtml = loginTpl
       .evaluate()
       .setTitle("Nijjara ERP | Login")
