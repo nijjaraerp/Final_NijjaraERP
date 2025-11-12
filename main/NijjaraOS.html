@@ -1652,52 +1652,6 @@
           })
           .authenticateUser(username, password);
       }
-      function handleLogin() {
-        const username = document.getElementById('loginUser').value;
-        const password = document.getElementById('loginPass').value;
-        const feedback = document.getElementById('login-feedback');
-
-        if (!username || !password) {
-          feedback.textContent = 'يرجى إدخال اسم المستخدم وكلمة المرور';
-          return;
-        }
-
-        feedback.textContent = 'جاري التحقق...';
-
-        google.script.run
-          .withSuccessHandler(function(response) {
-            console.log('Login response:', response);
-            
-            if (response && response.success) {
-              state.authenticated = true;
-              state.currentUser = response.data;
-              feedback.textContent = '✓ تم تسجيل الدخول بنجاح';
-              
-              // Store session
-              try {
-                sessionStorage.setItem('nijjara_session', JSON.stringify(response.data));
-                sessionStorage.setItem('nijjara_login_success', 'true');
-                console.log('Session stored successfully');
-              } catch (e) {
-                console.error('Failed to store session:', e);
-                feedback.textContent = 'خطأ في حفظ الجلسة';
-                return;
-              }
-              
-              setTimeout(() => {
-                showDesktop();
-              }, 1000);
-            } else {
-              feedback.textContent = response.message || 'فشل تسجيل الدخول';
-              document.getElementById('loginPass').value = '';
-            }
-          })
-          .withFailureHandler(function(error) {
-            console.error('Login error:', error);
-            feedback.textContent = 'خطأ في الاتصال: ' + error.message;
-          })
-          .authenticateUser(username, password);
-      }
 
       // --- Desktop Interface ---
       function showDesktop() {
