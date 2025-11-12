@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NijjaraOS</title>
+    <title>نِجّارا ERP — الصفحة الرئيسية</title>
     <style>
       /* Global styles */
       * {
@@ -47,22 +47,22 @@
           );
       }
 
-      /* The Galaxy (central glass orb) */
-      .galaxy {
+      /* Central Search Hub (premium glass) */
+      .hub {
         position: absolute;
         left: 50%;
         top: 50%;
         transform: translate(-50%, -50%);
-        width: 360px;
-        height: 360px;
-        border-radius: 50%;
+        width: 420px;
+        height: 220px;
+        border-radius: 28px;
         background: radial-gradient(
-            120px 120px at 45% 40%,
+            140px 140px at 55% 45%,
             rgba(255, 255, 255, 0.35),
             rgba(255, 255, 255, 0.08)
           ),
           radial-gradient(
-            180px 180px at 55% 60%,
+            220px 220px at 55% 60%,
             rgba(255, 255, 255, 0.2),
             rgba(255, 255, 255, 0.07)
           ),
@@ -73,19 +73,17 @@
           );
         backdrop-filter: blur(14px);
         border: 1px solid rgba(255, 255, 255, 0.15);
-        box-shadow: inset 0 0 60px rgba(255, 255, 255, 0.06),
-          inset 0 0 120px rgba(255, 255, 255, 0.05),
-          0 40px 120px rgba(0, 0, 0, 0.6);
+        box-shadow: inset 0 0 60px rgba(255, 255, 255, 0.06), 0 40px 120px rgba(0, 0, 0, 0.6);
         display: flex;
         align-items: center;
         justify-content: center;
         z-index: 2;
       }
-      .galaxy::before {
+      .hub::before {
         content: "";
         position: absolute;
-        inset: -6px;
-        border-radius: 50%;
+        inset: -8px;
+        border-radius: 30px;
         background: radial-gradient(
           closest-side,
           rgba(255, 255, 255, 0.08),
@@ -93,13 +91,38 @@
         );
         filter: blur(10px);
       }
-      .galaxy-title {
+      .hub-title {
         font-weight: 600;
         letter-spacing: 4px;
-        font-size: 16px;
+        font-size: 18px;
         color: #e2e8f0;
         text-transform: uppercase;
         text-shadow: 0 0 12px rgba(255, 255, 255, 0.25);
+      }
+      .hub-search {
+        position: absolute;
+        bottom: 24px;
+        width: 80%;
+        display: flex;
+        gap: 8px;
+      }
+      .hub-input {
+        flex: 1;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: rgba(17, 24, 39, 0.35);
+        color: #e2e8f0;
+      }
+      .hub-input::placeholder { color: #94a3b8; }
+      .hub-btn {
+        padding: 12px 16px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: linear-gradient(135deg, #06b6d4, #7c3aed);
+        color: #0b1020;
+        font-weight: 600;
+        cursor: pointer;
       }
 
       /* Orbit ring */
@@ -108,12 +131,20 @@
         left: 50%;
         top: 50%;
         transform: translate(-50%, -50%);
-        width: 560px;
-        height: 560px;
+        width: 600px;
+        height: 600px;
         border-radius: 50%;
         border: 1px solid rgba(148, 163, 184, 0.25);
         box-shadow: 0 0 60px rgba(148, 163, 184, 0.15);
         filter: drop-shadow(0 0 20px rgba(148, 163, 184, 0.25));
+        z-index: 1;
+      }
+      /* Neural links from hub to modules */
+      .link {
+        position: absolute;
+        height: 2px;
+        background: linear-gradient(90deg, rgba(255,255,255,0.1), rgba(148,163,184,0.35));
+        box-shadow: 0 0 12px rgba(148,163,184,0.25);
         z-index: 1;
       }
 
@@ -142,8 +173,8 @@
       }
       .module-label {
         color: #e2e8f0;
-        font-weight: 600;
-        letter-spacing: 1.5px;
+        font-weight: 700;
+        letter-spacing: 1.2px;
       }
 
       /* Distinct color glows per module */
@@ -167,21 +198,21 @@
       /* Position modules evenly around the ring */
       .pos-top {
         left: 50%;
-        top: calc(50% - 280px);
+        top: calc(50% - 260px);
         transform: translate(-50%, 0);
       }
       .pos-right {
-        left: calc(50% + 280px);
+        left: calc(50% + 300px);
         top: 50%;
         transform: translate(-50%, -50%);
       }
       .pos-bottom {
         left: 50%;
-        top: calc(50% + 280px);
+        top: calc(50% + 260px);
         transform: translate(-50%, -100%);
       }
       .pos-left {
-        left: calc(50% - 280px);
+        left: calc(50% - 300px);
         top: 50%;
         transform: translate(0, -50%);
       }
@@ -232,12 +263,18 @@
   </head>
   <body data-debug="<?!= debug ?>">
     <div class="bg-texture"></div>
-    <div class="galaxy"><div class="galaxy-title">The Galaxy</div></div>
+    <div class="hub">
+      <div class="hub-title">مركز البحث</div>
+      <form class="hub-search" onsubmit="event.preventDefault();">
+        <input class="hub-input" type="search" placeholder="ابحث عبر النظام…" aria-label="بحث" />
+        <button class="hub-btn" type="submit">بحث</button>
+      </form>
+    </div>
     <div class="orbit-ring"></div>
 
     <!-- Four modules orbiting evenly -->
     <div class="module m-hr pos-top" data-module="HR">
-      <div class="module-label">HR</div>
+      <div class="module-label">الموارد البشرية</div>
       <div class="planets">
         <div class="planet" style="top: -20px; left: 50%"></div>
         <div
@@ -251,7 +288,7 @@
       </div>
     </div>
     <div class="module m-sys pos-right" data-module="System">
-      <div class="module-label">System</div>
+      <div class="module-label">إعدادات النظام</div>
       <div class="planets">
         <div class="planet" style="top: -20px; left: 50%"></div>
         <div
@@ -265,7 +302,7 @@
       </div>
     </div>
     <div class="module m-fin pos-bottom" data-module="Finance">
-      <div class="module-label">Finance</div>
+      <div class="module-label">الإدارة المالية</div>
       <div class="planets">
         <div class="planet" style="top: -20px; left: 50%"></div>
         <div
@@ -279,7 +316,7 @@
       </div>
     </div>
     <div class="module m-prj pos-left" data-module="Projects">
-      <div class="module-label">Projects</div>
+      <div class="module-label">إدارة المشاريع</div>
       <div class="planets">
         <div class="planet" style="top: -20px; left: 50%"></div>
         <div
@@ -292,6 +329,12 @@
         ></div>
       </div>
     </div>
+
+    <!-- Neural Links -->
+    <div class="link" style="width: 220px; right: calc(50% + 210px); top: 50%"></div>
+    <div class="link" style="width: 220px; left: calc(50% + 210px); top: 50%"></div>
+    <div class="link" style="height: 2px; width: 220px; left: 50%; top: calc(50% - 210px); transform: translateX(-50%)"></div>
+    <div class="link" style="height: 2px; width: 220px; left: 50%; top: calc(50% + 210px); transform: translateX(-50%)"></div>
 
     <div class="hud">
       Hover a module to reveal its planets (sub-modules). Debug:
