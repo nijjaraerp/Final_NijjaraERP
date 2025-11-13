@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json.schemastore.org/tasks",
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Push to Apps Script",
+      "type": "shell",
+      "command": "npm run push",
+      "problemMatcher": []
+    },
+    {
+      "label": "Deploy (push + git)",
+      "type": "shell",
+      "command": "npm run deploy",
+      "problemMatcher": []
+    },
+    {
+      "label": "Repo Status",
+      "type": "shell",
+      "command": "npm run status",
+      "problemMatcher": []
+    },
+    {
+      "label": "Lint",
+      "type": "shell",
+      "command": "npm run lint",
+      "problemMatcher": ["$eslint-stylish"]
+    },
+    {
+      "label": "Format",
+      "type": "shell",
+      "command": "npm run format",
+      "problemMatcher": []
+    },
+    {
+      "label": "Health Check",
+      "type": "shell",
+      "command": "npm run health",
+      "problemMatcher": []
+    },
+    {
+      "label": "Submit NL Request (active file)",
+      "type": "shell",
+      "command": "npm run request -- \"${file}\"",
+      "problemMatcher": []
+    },
+    {
+      "label": "Start Browser Testing Server",
+      "type": "shell",
+      "command": "npm run test:start",
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Automated Deploy with Validation",
+      "type": "shell",
+      "command": "npm run test:deploy",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Pre-push Validation",
+      "type": "shell",
+      "command": "npm run test:validate",
+      "problemMatcher": ["$eslint-stylish"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Generate Agent Status Report",
+      "type": "shell",
+      "command": "npm run test:status",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Open Browser Preview",
+      "type": "shell",
+      "command": "start http://localhost:8080",
+      "windows": {
+        "command": "start http://localhost:8080"
+      },
+      "linux": {
+        "command": "xdg-open http://localhost:8080"
+      },
+      "osx": {
+        "command": "open http://localhost:8080"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Verify Browser Testing Setup",
+      "type": "shell",
+      "command": "npm run test:verify",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
+  ]
+}

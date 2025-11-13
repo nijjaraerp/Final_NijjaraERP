@@ -1,11 +1,29 @@
 #!/usr/bin/env sh
 . "$(dirname "$0")/_/husky.sh"
 
-echo "Running pre-push safeguards..."
+echo "🔍 Running pre-push validation..."
+
+# 1. Verify Apps Script paths
+echo "Checking Apps Script paths..."
 npm run verify:appscript-paths || {
-  echo "Pre-push aborted due to policy violations."
+  echo "❌ Apps Script path verification failed."
   exit 1
 }
 
-echo "Pre-push checks passed. Proceeding."
+# 2. Run ESLint
+echo "Running ESLint..."
+npm run lint || {
+  echo "❌ ESLint validation failed."
+  exit 1
+}
+
+# 3. Run health check
+echo "Running health check..."
+npm run health || {
+  echo "❌ Health check failed."
+  exit 1
+}
+
+echo "✅ Pre-push validation passed. Proceeding with push."
+
 

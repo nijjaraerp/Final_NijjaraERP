@@ -15,3 +15,7 @@ npm-debug.log
 
 # Local context files for AI agents
 .context/
+
+# Local environment secrets
+.env
+

@@ -1,0 +1,52 @@
+{
+  "task": {
+    "title": "There are 6 problems, plz fix them or adjust settings to ignore them.",
+    "description": "## Acceptance Criteria\n- There are 6 problems, plz fix them or adjust settings to ignore them.\n- In file .gitignore, line 16: Missing newline at end of file.\n- Fix the chrome-devtools-mcp issue.\n- Setup puppeteer.\n- Make sure that the huge number of files in Final_NijjaraERP are all needed otherwise delete them.",
+    "components": [],
+    "acceptanceCriteria": [
+      "There are 6 problems, plz fix them or adjust settings to ignore them.",
+      "In file .gitignore, line 16: Missing newline at end of file.",
+      "Fix the chrome-devtools-mcp issue.",
+      "Setup puppeteer.",
+      "Make sure that the huge number of files in Final_NijjaraERP are all needed otherwise delete them."
+    ],
+    "dependencies": [],
+    "risks": [],
+    "metadata": {
+      "createdAt": "2025-11-13T20:19:28.892Z",
+      "source": "nlp-pipeline@local"
+    }
+  },
+  "validation": {
+    "ok": true,
+    "errors": []
+  },
+  "checklist": [
+    {
+      "id": 1,
+      "item": "Reviewed scope and acceptance criteria",
+      "done": false
+    },
+    {
+      "id": 2,
+      "item": "Identified impacted components/files",
+      "done": false
+    },
+    {
+      "id": 3,
+      "item": "Checked dependencies and blockers",
+      "done": false
+    },
+    {
+      "id": 4,
+      "item": "Risk mitigation in place",
+      "done": false
+    },
+    {
+      "id": 5,
+      "item": "Rollback/backup plan prepared",
+      "done": false
+    }
+  ],
+  "agentPrompt": "Title: There are 6 problems, plz fix them or adjust settings to ignore them.\n\nDescription:\n## Acceptance Criteria\n- There are 6 problems, plz fix them or adjust settings to ignore them.\n- In file .gitignore, line 16: Missing newline at end of file.\n- Fix the chrome-devtools-mcp issue.\n- Setup puppeteer.\n- Make sure that the huge number of files in Final_NijjaraERP are all needed otherwise delete them.\n\nAcceptance Criteria:\n- There are 6 problems, plz fix them or adjust settings to ignore them.\n- In file .gitignore, line 16: Missing newline at end of file.\n- Fix the chrome-devtools-mcp issue.\n- Setup puppeteer.\n- Make sure that the huge number of files in Final_NijjaraERP are all needed otherwise delete them.\n\nComponents:\n\nDependencies:\n\nRisks:"
+}

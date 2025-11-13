@@ -1,0 +1,37 @@
+{
+  "sessionId": "session-2025-11-13T21-38-55-560Z",
+  "agentId": "cli-agent",
+  "tasks": [
+    {
+      "id": "task1",
+      "description": "Browser environment setup",
+      "status": "complete",
+      "startTime": "2025-11-13T21:38:55.566Z",
+      "endTime": "2025-11-13T21:38:55.567Z",
+      "error": null
+    },
+    {
+      "id": "task2",
+      "description": "Version control integration",
+      "status": "complete",
+      "startTime": "2025-11-13T21:38:55.567Z",
+      "endTime": "2025-11-13T21:38:55.568Z",
+      "error": null
+    },
+    {
+      "id": "task3",
+      "description": "Deployment automation",
+      "status": "complete",
+      "startTime": "2025-11-13T21:38:55.568Z",
+      "endTime": "2025-11-13T21:38:55.569Z",
+      "error": null
+    }
+  ],
+  "completedAt": "2025-11-13T21:38:55.573Z",
+  "statistics": {
+    "total": 3,
+    "complete": 3,
+    "partial": 0,
+    "failed": 0
+  }
+}

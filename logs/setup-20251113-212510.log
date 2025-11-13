@@ -1,0 +1,28 @@
+[2025-11-13 21:25:10Z] Starting setup at 20251113-212510
+[2025-11-13 21:25:10Z] Checking Node.js version...
+v22.19.0
+[2025-11-13 21:25:10Z] Checking npm version...
+11.6.1
+[2025-11-13 21:25:10Z] Checking git version...
+git version 2.51.0.windows.2
+[2025-11-13 21:25:10Z] Installing @google/clasp globally (optional)...
+
+changed 258 packages in 21s
+
+81 packages are looking for funding
+  run `npm fund` for details
+[2025-11-13 21:25:31Z] Installing project npm dependencies...
+
+> nijjara-erp@1.0.0 prepare
+> husky install
+
+
+added 342 packages, and audited 343 packages in 16s
+
+108 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+[2025-11-13 21:25:48Z] .env already exists – leaving untouched.
+[2025-11-13 21:25:48Z] Ensuring MCP server paths point to current workspace...
+[2025-11-13 21:25:48Z] ERROR: The regular expression pattern c:\\\\\Users\\\\moham\\\\MK_Work\\\\[^"\\]+ is not valid.

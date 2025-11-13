@@ -1,0 +1,48 @@
+{
+  "task": {
+    "title": "Untitled task",
+    "description": "C:\\Users\\moham\\MK_Work\\Final_NijjaraERP\\requests\\Setup",
+    "components": [],
+    "acceptanceCriteria": [],
+    "dependencies": [],
+    "risks": [],
+    "metadata": {
+      "createdAt": "2025-11-13T21:07:36.161Z",
+      "source": "nlp-pipeline@local"
+    }
+  },
+  "validation": {
+    "ok": false,
+    "errors": [
+      "acceptance criteria required (list at least 1)"
+    ]
+  },
+  "checklist": [
+    {
+      "id": 1,
+      "item": "Reviewed scope and acceptance criteria",
+      "done": false
+    },
+    {
+      "id": 2,
+      "item": "Identified impacted components/files",
+      "done": false
+    },
+    {
+      "id": 3,
+      "item": "Checked dependencies and blockers",
+      "done": false
+    },
+    {
+      "id": 4,
+      "item": "Risk mitigation in place",
+      "done": false
+    },
+    {
+      "id": 5,
+      "item": "Rollback/backup plan prepared",
+      "done": false
+    }
+  ],
+  "agentPrompt": "Title: Untitled task\n\nDescription:\nC:\\Users\\moham\\MK_Work\\Final_NijjaraERP\\requests\\Setup\n\nAcceptance Criteria:\n\nComponents:\n\nDependencies:\n\nRisks:"
+}
